@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Fisioteruel - Fisioterapia Premium a Domicilio</title>
+  
+  <!-- CSS assets inside file -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0..1,0&display=swap" rel="stylesheet"/>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#004097',
+            secondary: '#425d98',
+            tertiary: '#676000',
+            background: '#faf9ff',
+            'surface-container-low': '#f1f3ff',
+            'surface-container-lowest': '#ffffff',
+            'on-surface-variant': '#424653'
+          },
+          fontFamily: {
+            serif: ['"Source Serif 4"', 'Georgia', 'serif'],
+            sans: ['"Work Sans"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 64, 151, 0.08);
+    }
+    .cream-bg {
+      background-color: #FDFCF8;
+    }
+  </style>
+</head>
+<body class="cream-bg text-[#161b28] font-sans overflow-x-hidden min-h-screen flex flex-col justify-between">
+
+  <!-- Header Dynamic Component (Reusable) -->
+  <fisioteruel-header></fisioteruel-header>
+
+  <!-- Hero Section -->
+  <main class="flex-grow">
+    <section class="relative min-h-[600px] lg:min-h-[700px] flex items-center px-6 py-12 overflow-hidden">
+      <div class="absolute inset-0 z-0">
+        <!-- Replaced image with high-quality landscape representation of cozy clinical/home wellness therapy session -->
+        <img class="w-full h-full object-cover select-none" alt="Fisioterapia en casa" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqlWyiRvgy_X4zSv82QuiI9TtuJfM9TWV0dOO0VJaFfT0Ueul9slMJEYJ9H7ya3PigHP0s_pzHt5CRHeFxiZxja-y7YD9Ip93-qjnrQ-JIQZPNZ0xiMTkFkGaYYVWR5z_8a3SKpYWt-20v8wBJWv1E6ZenCr5nBwHYZDoTF3MgtuhWrVzIBu1xB7loqgnYUi7Aq1wNo_TDWQw8I78-0u0cDVBG_A-m5F1apTLIOhKs4ztkz2Evdbszs-vxJKjDk3hF5vVQUQi8zSQ"/>
+        <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/85 to-transparent"></div>
+      </div>
+      
+      <div class="relative z-10 max-w-[1280px] mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flex flex-col items-start gap-6 max-w-lg">
+          <span class="bg-[#d9e2ff] text-[#29457f] px-4 py-1.5 rounded-full text-sm font-semibold tracking-wide">
+            Fisioterapia Premium a Domicilio
+          </span>
+          <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl text-primary font-bold leading-tight tracking-tight">
+            Recupera tu Movimiento, Transforma tu Vida
+          </h1>
+          <p class="text-lg lg:text-xl text-on-surface-variant leading-relaxed">
+            Fisioterapia a domicilio y masajes terapéuticos profesionales en Teruel Capital. Cuidado clínico personalizado en la comodidad de tu hogar.
+          </p>
+          <div class="flex flex-wrap gap-4 mt-2">
+            <a href="./servicios.html#agenda-directa" class="bg-tertiary text-white px-8 py-4 rounded-lg text-sm font-bold shadow-lg hover:bg-opacity-95 transition-all transform hover:-translate-y-px active:translate-y-0 select-none">
+              Solicita tu evaluación
+            </a>
+            <a href="./servicios.html" class="border border-primary text-primary px-8 py-4 rounded-lg text-sm font-bold hover:bg-primary/5 transition-colors select-none">
+              Ver Servicios
+            </a>
+          </div>
+          
+          <div class="flex items-center gap-4 mt-8 py-4 border-t border-[#c2c6d6]/40 w-full">
+            <div class="flex -space-x-2">
+              <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-300 overflow-hidden flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#425d98]">person</span>
+              </div>
+              <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-300 overflow-hidden flex items-center justify-center">
+                <span class="material-symbols-outlined text-[#676000]">face</span>
+              </div>
+              <div class="w-10 h-10 rounded-full border-2 border-white bg-slate-300 overflow-hidden flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary">diversity_1</span>
+              </div>
+            </div>
+            <p class="text-xs sm:text-sm text-on-surface-variant font-medium">
+              <span class="font-bold text-primary">+500</span> pacientes recuperados en Teruel capital y provincia
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-20 max-w-[1280px] mx-auto px-6" id="ventajas">
+      <div class="text-center mb-16">
+        <h2 class="font-serif text-3xl sm:text-4xl text-primary font-bold mb-4">Nuestros Servicios Especializados</h2>
+        <p class="text-base text-on-surface-variant max-w-2xl mx-auto leading-relaxed">
+          Combinamos técnicas clínicas avanzadas con la comodidad del hogar para acelerar tu proceso de recuperación de forma segura.
+        </p>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Service Card 1 -->
+        <div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-[#c2c6d6]/20 flex flex-col justify-between">
+          <div>
+            <div class="mb-5 text-primary">
+              <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">rebase_edit</span>
+            </div>
+            <h3 class="font-serif text-xl font-bold text-[#161b28] mb-3">Fisioterapia</h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+              Rehabilitación post-quirúrgica, lesiones deportivas y manejo del dolor crónico con fisioterapeutas colegiados de alta experiencia.
+            </p>
+          </div>
+          <a class="text-primary font-bold text-sm tracking-wide flex items-center gap-2 group-hover:translate-x-1 transition-transform" href="./servicios.html#fisioterapia">
+            Saber más <span class="material-symbols-outlined text-sm font-semibold">arrow_forward</span>
+          </a>
+        </div>
+        
+        <!-- Service Card 2 -->
+        <div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-[#c2c6d6]/20 flex flex-col justify-between">
+          <div>
+            <div class="mb-5 text-primary">
+              <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">spa</span>
+            </div>
+            <h3 class="font-serif text-xl font-bold text-[#161b28] mb-3">Masajes Terapéuticos</h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+              Masaje descontracturante, deportivo, de descarga muscular, relajación y drenaje linfático para restaurar el equilibrio perfecto.
+            </p>
+          </div>
+          <a class="text-primary font-bold text-sm tracking-wide flex items-center gap-2 group-hover:translate-x-1 transition-transform" href="./servicios.html#masajes">
+            Saber más <span class="material-symbols-outlined text-sm font-semibold">arrow_forward</span>
+          </a>
+        </div>
+        
+        <!-- Service Card 3 -->
+        <div class="group relative overflow-hidden rounded-xl bg-surface-container-lowest p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-[#c2c6d6]/20 flex flex-col justify-between">
+          <div>
+            <div class="mb-5 text-primary">
+              <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">loyalty</span>
+            </div>
+            <h3 class="font-serif text-xl font-bold text-[#161b28] mb-3">Planes Personalizados</h3>
+            <p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+              Programas de mantenimiento preventivo, bonos multi-sesión y bienestar a largo plazo para toda la familia sin salir de casa.
+            </p>
+          </div>
+          <a class="text-primary font-bold text-sm tracking-wide flex items-center gap-2 group-hover:translate-x-1 transition-transform" href="./servicios.html#combos">
+            Saber más <span class="material-symbols-outlined text-sm font-semibold">arrow_forward</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Separator Section -->
+    <section class="py-16 px-6 bg-gradient-to-r from-primary to-[#0056c6] text-white">
+      <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row items-center justify-between gap-8 text-center md:text-left">
+        <div class="flex-grow max-w-2xl">
+          <h2 class="font-serif text-3xl sm:text-4xl text-white font-bold mb-4">Comienza tu camino hoy</h2>
+          <p class="text-lg opacity-90 leading-relaxed">
+            Primera evaluación de fisioterapia integral con plan de tratamiento personalizado por solo <span class="font-bold text-[#d9e2ff]">65 €</span> <span class="text-xs opacity-75">(Equivalente a DOP$ 5.500)</span>.
+          </p>
+        </div>
+        <div class="flex-shrink-0">
+          <a href="./servicios.html#agenda-directa" class="inline-block bg-tertiary text-white px-8 py-4 rounded-lg text-sm font-bold shadow-lg hover:scale-[1.03] transition-transform active:scale-95">
+            Agendar mi evaluación
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Aesthetic Detail Section -->
+    <section class="py-20 overflow-hidden" id="estandar">
+      <div class="max-w-[1280px] mx-auto px-6 grid grid-cols-1 md:grid-cols-2 items-center gap-16">
+        <div class="relative">
+          <div class="absolute -top-10 -left-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+          <!-- Tactile hands close up image -->
+          <img class="rounded-2xl shadow-xl relative z-10 w-full h-[400px] object-cover select-none" alt="Terapia manual" src="https://lh3.googleusercontent.com/aida-public/AB6AXuATpIHhH64lrPvCE0abaxjLVNGuJ--qxK6LY0T_rCdotCe1_oXZqLquLUXF5kxoW9P6QmOpokM6wuNdL5rzJQOu2ZSawIVJoszB75xxncaE1cOTWTu8LEvwSy_8XCawrFe4xwe87Hq7PafrpqsPMkjgOFUnnsFgnjpPB0D8bRABxybIaqmsBNQKhPFbSo3RfobR3TzW4_NAMbSwPV3z52TCx7FnT22hAwb1FCYf4UQgyR7R-tHhjhVdNN_iRqdo9PJd7Wrw5KXzcy8"/>
+        </div>
+        <div>
+          <h2 class="font-serif text-3xl sm:text-4xl text-primary font-bold mb-8 leading-tight">El estándar de cuidado que mereces</h2>
+          
+          <ul class="space-y-6">
+            <li class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-[#425d98] text-2xl mt-1">check_circle</span>
+              <div>
+                <p class="font-bold text-base text-[#161b28]">Fisioterapeutas Colegiados</p>
+                <p class="text-sm text-on-surface-variant mt-1 leading-relaxed">Fisio profesionales titulados con alta experiencia en Teruel capital y centros de salud.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-[#425d98] text-2xl mt-1">check_circle</span>
+              <div>
+                <p class="font-bold text-base text-[#161b28]">Equipamiento Portátil Avanzado</p>
+                <p class="text-sm text-on-surface-variant mt-1 leading-relaxed">Llevamos camillas ergonómicas portátiles, aceites y vendajes necesarios a tu salón.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-4">
+              <span class="material-symbols-outlined text-[#425d98] text-2xl mt-1">check_circle</span>
+              <div>
+                <p class="font-bold text-base text-[#161b28]">Flexibilidad de Horario</p>
+                <p class="text-sm text-on-surface-variant mt-1 leading-relaxed">Atendemos a tu mejor ritmo, de lunes a sábado de 7:00 AM a 8:00 PM sin esperas ni desplazamientos.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Component (Reusable) -->
+  <fisioteruel-footer></fisioteruel-footer>
+
+  <!-- Script for Reusable Web Components -->
+  <script src="./header-footer.js"></script>
+</body>
+</html>

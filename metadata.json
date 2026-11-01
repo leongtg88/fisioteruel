@@ -1,0 +1,6 @@
+{
+  "name": "Fisioteruel",
+  "description": "Fisioterapia a domicilio y masajes terapéuticos profesionales en Teruel. Cuidado personalizado en la comodidad de tu hogar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
