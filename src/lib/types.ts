@@ -24,5 +24,3 @@ export interface AdvancedBooking {
   totalPrice: number;
   status: "pending" | "confirmed" | "completed";
 }
-
-export type ScreenType = "inicio" | "servicios" | "agendar" | "descargar";

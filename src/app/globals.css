@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0f766e; /* Teal-700 for legible, rich branding & typography */
+  --color-secondary: #2563eb; /* Blue-600 accent */
+  --color-tertiary: #115e59; /* Teal-800 button styling */
+  --color-accent-amber: #d97706; /* Amber-650 */
+  --color-surface-container: rgba(255, 255, 255, 0.45);
+  --color-surface-container-low: rgba(255, 255, 255, 0.25);
+  --color-surface-container-lowest: rgba(255, 255, 255, 0.7);
+  --color-cream-bg: #eef2f6; /* Modern grey-blue canvas background */
+  --color-on-surface-variant: #424653;
+}
+
+/* Source Serif 4 y Work Sans se cargan con next/font (app/layout.tsx) y se
+   exponen como variables CSS. Material Symbols se sirve por <link> porque
+   necesita ejes variables (FILL/GRAD) que next/font no soporta. */
+@theme inline {
+  --font-serif: var(--font-source-serif), Georgia, serif;
+  --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  /* El SPA original hacía scroll suave manual al cambiar de pantalla. Con
+     rutas reales se conserva para los anclajes internos (#masajes, #combos).
+     El atributo data-scroll-behavior de <html> hace que Next 16 lo suspenda
+     durante las navigaciones para que el cambio de página sea instantáneo. */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .material-symbols-outlined {
+    font-family: "Material Symbols Outlined", sans-serif;
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+    display: inline-block;
+    vertical-align: middle;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px 0 rgba(15, 118, 110, 0.04);
+  }
+  .glass-card-dense {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 12px 40px 0 rgba(15, 118, 110, 0.06);
+  }
+}
+
+@keyframes fisioteruel-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Antes se usaba `animate-fade-in` sin estar definido: ahora existe. */
+.animate-fade-in {
+  animation: fisioteruel-fade-in 0.45s ease-out both;
+}

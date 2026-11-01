@@ -1,26 +1,93 @@
-import React, { useState, useEffect } from "react";
-import { AdvancedBooking, ServiceItem } from "../types";
-import { SERVICES_DATA, COMBOS_DATA } from "../data";
-import { formatPrice } from "../utils";
+"use client";
+
+import React, { useEffect, useRef, useState } from "react";
+import { useCurrency } from "@/components/CurrencyProvider";
+import { COMBOS_DATA, SERVICES_DATA } from "@/lib/data";
+import { formatPrice } from "@/lib/format";
+import type { AdvancedBooking } from "@/lib/types";
 
 interface BookingViewProps {
-  currency: "EUR" | "DOP";
-  selectedServiceId?: string;
-  setSelectedServiceId: (serviceId: string) => void;
+  /**
+   * Servicio preseleccionado. Antes vivía en un `useState` de App.tsx; ahora
+   * llega desde la URL (`/agendar?servicio=...`).
+   */
+  initialServiceId?: string;
 }
 
-export default function BookingView({
-  currency,
-  selectedServiceId,
-  setSelectedServiceId
-}: BookingViewProps) {
-  // Combine services and combos for the dropdown selection
-  const ALL_OPTIONS = [
-    ...SERVICES_DATA.map((s) => ({ id: s.id, name: s.name, price: s.price })),
-    ...COMBOS_DATA.map((c) => ({ id: c.id, name: `${c.name} (${c.tag})`, price: c.price }))
-  ];
+const STORAGE_KEY = "fisioteruel_bookings";
+
+/** Combine services and combos for the dropdown selection */
+const ALL_OPTIONS = [
+  ...SERVICES_DATA.map((s) => ({ id: s.id, name: s.name, price: s.price })),
+  ...COMBOS_DATA.map((c) => ({
+    id: c.id,
+    name: `${c.name} (${c.tag})`,
+    price: c.price,
+  })),
+];
+
+const TIME_SLOTS: { value: string; label: string }[] = [
+  { value: "morning_1", label: "Mañana (08:00 - 11:00)" },
+  { value: "morning_2", label: "Mediodía (11:00 - 14:00)" },
+  { value: "afternoon_1", label: "Tarde Temprana (15:00 - 18:00)" },
+  { value: "afternoon_2", label: "Tarde Noche (18:00 - 20:00)" },
+];
+
+const CITIES = [
+  "Teruel Capital",
+  "Alcañiz",
+  "Andorra (Teruel)",
+  "Calamocha",
+  "Cella",
+  "Utrillas",
+  "Monreal del Campo",
+];
+
+const TIME_LABELS: Record<string, string> = Object.fromEntries(
+  TIME_SLOTS.map((slot) => [slot.value, slot.label])
+);
+
+// Seed initial mock booking to populate the screen beautifully with example data!
+const SEEDED_BOOKINGS: AdvancedBooking[] = [
+  {
+    id: "bk-seeded-1",
+    patientName: "María Amparo Gómez",
+    patientPhone: "+34 670 123 456",
+    patientEmail: "amparo@gomez.org",
+    patientAddress: "Avenida de Sagunto, 14, 2ºB",
+    patientCity: "Teruel Capital",
+    serviceId: "eval-integral",
+    bookingDate: "2026-06-15",
+    bookingTime: "morning_2",
+    additionalNotes:
+      "Paciente post-operatorio de cadera derecha, requiere valoración inicial.",
+    totalPrice: 5500,
+    status: "confirmed",
+  },
+];
+
+const inputClasses =
+  "w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all shadow-2xs";
+
+const labelClasses =
+  "block text-xs font-black text-slate-700 uppercase tracking-wider mb-2";
+
+function getServiceName(id: string) {
+  const match = ALL_OPTIONS.find((opt) => opt.id === id);
+  return match ? match.name : "Servicio General de Fisioterapia";
+}
+
+function getTimeLabel(timeVal: string) {
+  return TIME_LABELS[timeVal] ?? timeVal;
+}
+
+export default function BookingView({ initialServiceId }: BookingViewProps) {
+  const { currency } = useCurrency();
 
   // Local state for form submission variables
+  const [selectedServiceId, setSelectedServiceId] = useState(
+    initialServiceId || "eval-integral"
+  );
   const [patientName, setPatientName] = useState("");
   const [patientPhone, setPatientPhone] = useState("");
   const [patientEmail, setPatientEmail] = useState("");
@@ -29,53 +96,47 @@ export default function BookingView({
   const [bookingDate, setBookingDate] = useState("");
   const [bookingTime, setBookingTime] = useState("afternoon_1");
   const [additionalNotes, setAdditionalNotes] = useState("");
-  
+
   // Storage of booked appointments
   const [bookingsList, setBookingsList] = useState<AdvancedBooking[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [lastBookedInfo, setLastBookedInfo] = useState<AdvancedBooking | null>(null);
+  const [lastBookedInfo, setLastBookedInfo] = useState<AdvancedBooking | null>(
+    null
+  );
+  const successTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load from local storage for durable persistence!
   useEffect(() => {
-    const saved = localStorage.getItem("fisioteruel_bookings");
+    const saved = window.localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        setBookingsList(JSON.parse(saved));
-      } catch (e) {
-        console.error("Could not parse saved bookings", e);
+        setBookingsList(JSON.parse(saved) as AdvancedBooking[]);
+      } catch (error) {
+        console.error("Could not parse saved bookings", error);
       }
     } else {
-      // Seed initial mock booking to populate the screen beautifully with example data!
-      const mockInitial: AdvancedBooking[] = [
-        {
-          id: "bk-seeded-1",
-          patientName: "María Amparo Gómez",
-          patientPhone: "+34 670 123 456",
-          patientEmail: "amparo@gomez.org",
-          patientAddress: "Avenida de Sagunto, 14, 2ºB",
-          patientCity: "Teruel Capital",
-          serviceId: "eval-integral",
-          bookingDate: "2026-06-15",
-          bookingTime: "morning_2",
-          additionalNotes: "Paciente post-operatorio de cadera derecha, requiere valoración inicial.",
-          totalPrice: 5500,
-          status: "confirmed"
-        }
-      ];
-      setBookingsList(mockInitial);
-      localStorage.setItem("fisioteruel_bookings", JSON.stringify(mockInitial));
+      setBookingsList(SEEDED_BOOKINGS);
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(SEEDED_BOOKINGS));
     }
   }, []);
 
+  useEffect(
+    () => () => {
+      if (successTimer.current) clearTimeout(successTimer.current);
+    },
+    []
+  );
+
   const saveBookingsToStorage = (updated: AdvancedBooking[]) => {
     setBookingsList(updated);
-    localStorage.setItem("fisioteruel_bookings", JSON.stringify(updated));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   };
 
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const selectedOption = ALL_OPTIONS.find((opt) => opt.id === (selectedServiceId || "eval-integral")) || ALL_OPTIONS[0];
+    const selectedOption =
+      ALL_OPTIONS.find((opt) => opt.id === selectedServiceId) || ALL_OPTIONS[0];
 
     const newBooking: AdvancedBooking = {
       id: "bk-" + Date.now(),
@@ -89,12 +150,11 @@ export default function BookingView({
       bookingTime,
       additionalNotes,
       totalPrice: selectedOption.price,
-      status: "pending"
+      status: "pending",
     };
 
-    const updated = [newBooking, ...bookingsList];
-    saveBookingsToStorage(updated);
-    
+    saveBookingsToStorage([newBooking, ...bookingsList]);
+
     // Set feedback states
     setLastBookedInfo(newBooking);
     setShowSuccess(true);
@@ -108,66 +168,78 @@ export default function BookingView({
     setAdditionalNotes("");
 
     // Hide success alert after delay
-    setTimeout(() => {
-      setShowSuccess(false);
-    }, 10000);
+    if (successTimer.current) clearTimeout(successTimer.current);
+    successTimer.current = setTimeout(() => setShowSuccess(false), 10000);
   };
 
   const handleDeleteBooking = (id: string) => {
-    const isConfirmed = window.confirm("¿Seguro que deseas cancelar esta solicitud de cita a domicilio?");
+    const isConfirmed = window.confirm(
+      "¿Seguro que deseas cancelar esta solicitud de cita a domicilio?"
+    );
     if (isConfirmed) {
-      const filtered = bookingsList.filter((b) => b.id !== id);
-      saveBookingsToStorage(filtered);
-    }
-  };
-
-  const getServiceName = (id: string) => {
-    const match = ALL_OPTIONS.find((opt) => opt.id === id);
-    return match ? match.name : "Servicio General de Fisioterapia";
-  };
-
-  const getTimeLabel = (timeVal: string) => {
-    switch (timeVal) {
-      case "morning_1":
-        return "Mañana (08:00 - 11:00)";
-      case "morning_2":
-        return "Mediodía (11:00 - 14:00)";
-      case "afternoon_1":
-        return "Tarde Temprana (15:00 - 18:00)";
-      case "afternoon_2":
-        return "Tarde Noche (18:00 - 20:00)";
-      default:
-        return timeVal;
+      saveBookingsToStorage(bookingsList.filter((b) => b.id !== id));
     }
   };
 
   return (
-    <div className="animate-fade-in max-w-[1280px] mx-auto px-6 py-12 flex flex-col gap-12 relative z-10 animate-fade-in">
-      
+    <div className="animate-fade-in max-w-[1280px] mx-auto px-6 py-12 flex flex-col gap-12 relative z-10">
       {/* Visual Header */}
       <div className="text-center max-w-2xl mx-auto space-y-4">
         <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary">
-          <span className="material-symbols-outlined text-3xl font-light">calendar_month</span>
+          <span className="material-symbols-outlined text-3xl font-light">
+            calendar_month
+          </span>
         </div>
-        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-slate-900">Agenda tu Sesión a Domicilio</h2>
+        <h2 className="font-serif text-3xl sm:text-4xl font-bold text-slate-900">
+          Agenda tu Sesión a Domicilio
+        </h2>
         <p className="text-sm sm:text-base text-slate-700 font-bold leading-relaxed">
-          Reserva de forma inmediata. Dinos qué tratamiento precisas, tus datos de contacto y la dirección en Teruel para asignar a tu fisioterapeuta diplomado.
+          Reserva de forma inmediata. Dinos qué tratamiento precisas, tus datos
+          de contacto y la dirección en Teruel para asignar a tu fisioterapeuta
+          diplomado.
         </p>
       </div>
 
       {/* Success Banner */}
       {showSuccess && lastBookedInfo && (
-        <div className="bg-emerald-50/50 backdrop-blur-md border border-emerald-300 text-emerald-950 p-6 rounded-2xl shadow-md text-left max-w-3xl mx-auto flex items-start gap-4">
-          <span className="material-symbols-outlined text-3xl text-emerald-600 mt-0.5 select-none" style={{ fontVariationSettings: "'FILL' 1" }}>
+        <div
+          role="status"
+          className="bg-emerald-50/50 backdrop-blur-md border border-emerald-300 text-emerald-950 p-6 rounded-2xl shadow-md text-left max-w-3xl mx-auto flex items-start gap-4"
+        >
+          <span
+            className="material-symbols-outlined text-3xl text-emerald-600 mt-0.5 select-none"
+            style={{ fontVariationSettings: "'FILL' 1" }}
+          >
             check_circle
           </span>
           <div className="space-y-2">
-            <h4 className="font-extrabold text-[#065f46] text-base">¡Solicitud recibida correctamente!</h4>
+            <h4 className="font-extrabold text-[#065f46] text-base">
+              ¡Solicitud recibida correctamente!
+            </h4>
             <div className="text-sm leading-relaxed space-y-1 text-slate-800 font-semibold">
-              <p>Hemos registrado la cita para el paciente <strong className="text-emerald-950 font-black">{lastBookedInfo.patientName}</strong> el día <strong className="text-emerald-950 font-black">{lastBookedInfo.bookingDate}</strong> ({getTimeLabel(lastBookedInfo.bookingTime)}).</p>
-              <p>Tu solicitud se encuentra en estado <span className="bg-amber-100/80 border border-amber-350 text-amber-800 px-2 py-0.5 rounded text-xs font-extrabold font-mono">PENDIENTE DE REVISIÓN</span>. Nos pondremos en contacto telefónico contigo en un plazo máximo de 1 hora para confirmar la asignación del especialista.</p>
+              <p>
+                Hemos registrado la cita para el paciente{" "}
+                <strong className="text-emerald-950 font-black">
+                  {lastBookedInfo.patientName}
+                </strong>{" "}
+                el día{" "}
+                <strong className="text-emerald-950 font-black">
+                  {lastBookedInfo.bookingDate}
+                </strong>{" "}
+                ({getTimeLabel(lastBookedInfo.bookingTime)}).
+              </p>
+              <p>
+                Tu solicitud se encuentra en estado{" "}
+                <span className="bg-amber-100/80 border border-amber-300 text-amber-800 px-2 py-0.5 rounded text-xs font-extrabold font-mono">
+                  PENDIENTE DE REVISIÓN
+                </span>
+                . Nos pondremos en contacto telefónico contigo en un plazo máximo
+                de 1 hora para confirmar la asignación del especialista.
+              </p>
             </div>
-            <p className="text-xs text-emerald-800/80 font-bold mt-2 font-mono">ID Cita: {lastBookedInfo.id}</p>
+            <p className="text-xs text-emerald-800/80 font-bold mt-2 font-mono">
+              ID Cita: {lastBookedInfo.id}
+            </p>
           </div>
         </div>
       )}
@@ -176,21 +248,25 @@ export default function BookingView({
         {/* Reservation Form Column */}
         <div className="lg:col-span-7 bg-white/45 backdrop-blur-md p-6 sm:p-10 rounded-[2rem] border border-white/55 shadow-md">
           <h3 className="font-serif text-xl sm:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
-            <span className="material-symbols-outlined text-primary">edit_calendar</span>
+            <span className="material-symbols-outlined text-primary">
+              edit_calendar
+            </span>
             <span>Formulario de Reserva Directa</span>
           </h3>
 
           <form onSubmit={handleBookingSubmit} className="space-y-6">
-            
             {/* Field: Service drop down selection */}
             <div>
-              <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+              <label
+                htmlFor="booking_form_service"
+                className={labelClasses}
+              >
                 Tratamiento o Servicio Solicitado
               </label>
               <select
-                value={selectedServiceId || "eval-integral"}
+                value={selectedServiceId}
                 onChange={(e) => setSelectedServiceId(e.target.value)}
-                className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all cursor-pointer shadow-2xs"
+                className={`${inputClasses} cursor-pointer`}
                 id="booking_form_service"
               >
                 {ALL_OPTIONS.map((opt) => (
@@ -204,7 +280,7 @@ export default function BookingView({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Field: Patient Name */}
               <div>
-                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                <label htmlFor="booking_form_name" className={labelClasses}>
                   Nombre completo del paciente
                 </label>
                 <input
@@ -213,14 +289,14 @@ export default function BookingView({
                   value={patientName}
                   onChange={(e) => setPatientName(e.target.value)}
                   placeholder="Ej: Francisco Martínez Gómez"
-                  className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all shadow-2xs"
+                  className={inputClasses}
                   id="booking_form_name"
                 />
               </div>
 
               {/* Field: Patient Phone */}
               <div>
-                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                <label htmlFor="booking_form_phone" className={labelClasses}>
                   Número de teléfono móvil
                 </label>
                 <input
@@ -229,7 +305,7 @@ export default function BookingView({
                   value={patientPhone}
                   onChange={(e) => setPatientPhone(e.target.value)}
                   placeholder="Ej: +34 600 000 000"
-                  className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all shadow-2xs"
+                  className={inputClasses}
                   id="booking_form_phone"
                 />
               </div>
@@ -238,44 +314,43 @@ export default function BookingView({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Field: Patient Email (Optional) */}
               <div>
-                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
-                  Email de contacto <span className="text-slate-400 font-normal">(Opcional)</span>
+                <label htmlFor="booking_form_email" className={labelClasses}>
+                  Email de contacto{" "}
+                  <span className="text-slate-400 font-normal">(Opcional)</span>
                 </label>
                 <input
                   type="email"
                   value={patientEmail}
                   onChange={(e) => setPatientEmail(e.target.value)}
                   placeholder="Ej: contacto@dominio.com"
-                  className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all shadow-2xs"
+                  className={inputClasses}
                   id="booking_form_email"
                 />
               </div>
 
               {/* Field: Patient City / region */}
               <div>
-                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                <label htmlFor="booking_form_city" className={labelClasses}>
                   Localidad / Delegación
                 </label>
                 <select
                   value={patientCity}
                   onChange={(e) => setPatientCity(e.target.value)}
-                  className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all cursor-pointer shadow-2xs"
+                  className={`${inputClasses} cursor-pointer`}
                   id="booking_form_city"
                 >
-                  <option value="Teruel Capital">Teruel Capital</option>
-                  <option value="Alcañiz">Alcañiz</option>
-                  <option value="Andorra (Teruel)">Andorra (Teruel)</option>
-                  <option value="Calamocha">Calamocha</option>
-                  <option value="Cella">Cella</option>
-                  <option value="Utrillas">Utrillas</option>
-                  <option value="Monreal del Campo">Monreal del Campo</option>
+                  {CITIES.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
             {/* Field: Patient Address */}
             <div>
-              <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+              <label htmlFor="booking_form_address" className={labelClasses}>
                 Dirección exacta a domicilio
               </label>
               <input
@@ -284,7 +359,7 @@ export default function BookingView({
                 value={patientAddress}
                 onChange={(e) => setPatientAddress(e.target.value)}
                 placeholder="Calle, Número, Portal, Escalera, Piso, Puerta"
-                className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all shadow-2xs"
+                className={inputClasses}
                 id="booking_form_address"
               />
             </div>
@@ -292,7 +367,7 @@ export default function BookingView({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {/* Field: Date Picker */}
               <div>
-                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                <label htmlFor="booking_form_date" className={labelClasses}>
                   Fecha preferente de la cita
                 </label>
                 <input
@@ -300,33 +375,34 @@ export default function BookingView({
                   required
                   value={bookingDate}
                   onChange={(e) => setBookingDate(e.target.value)}
-                  className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-850 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all cursor-pointer shadow-2xs"
+                  className={`${inputClasses} cursor-pointer`}
                   id="booking_form_date"
                 />
               </div>
 
               {/* Field: Prefered Time slot */}
               <div>
-                <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+                <label htmlFor="booking_form_time" className={labelClasses}>
                   Franja horaria preferida
                 </label>
                 <select
                   value={bookingTime}
                   onChange={(e) => setBookingTime(e.target.value)}
-                  className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all cursor-pointer shadow-2xs"
+                  className={`${inputClasses} cursor-pointer`}
                   id="booking_form_time"
                 >
-                  <option value="morning_1">Mañana (08:00 - 11:00)</option>
-                  <option value="morning_2">Mediodía (11:00 - 14:00)</option>
-                  <option value="afternoon_1">Tarde Temprana (15:00 - 18:00)</option>
-                  <option value="afternoon_2">Tarde Noche (18:00 - 20:00)</option>
+                  {TIME_SLOTS.map((slot) => (
+                    <option key={slot.value} value={slot.value}>
+                      {slot.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
 
             {/* Field: Clinical Notes */}
             <div>
-              <label className="block text-xs font-black text-slate-700 uppercase tracking-wider mb-2">
+              <label htmlFor="booking_form_notes" className={labelClasses}>
                 Notas clínicas adicionales o motivo de consulta
               </label>
               <textarea
@@ -334,16 +410,20 @@ export default function BookingView({
                 onChange={(e) => setAdditionalNotes(e.target.value)}
                 placeholder="Ej: Dolor lumbar severo continuo desde ayer, post-operatorio de prótesis de rodilla, tengo camilla propia en casa, etc."
                 rows={3}
-                className="w-full bg-white/45 border border-white/60 rounded-xl p-3 text-sm font-semibold text-slate-800 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary focus:bg-white/70 transition-all shadow-2xs"
+                className={inputClasses}
                 id="booking_form_notes"
               ></textarea>
             </div>
 
             {/* Disclaimer policy */}
-            <div className="flex items-start gap-2 py-1 text-slate-650 font-bold text-xs leading-relaxed">
-              <span className="material-symbols-outlined text-primary text-sm mt-0.5 select-none font-black">info</span>
+            <div className="flex items-start gap-2 py-1 text-slate-600 font-bold text-xs leading-relaxed">
+              <span className="material-symbols-outlined text-primary text-sm mt-0.5 select-none font-black">
+                info
+              </span>
               <p className="text-[11px]">
-                Al enviar la solicitud, declaras conocer que Fisioteruel enviará a un profesional a domicilio colegiado y de confianza. La cita es de confirmación telefónica directa previa.
+                Al enviar la solicitud, declaras conocer que Fisioteruel enviará
+                a un profesional a domicilio colegiado y de confianza. La cita es
+                de confirmación telefónica directa previa.
               </p>
             </div>
 
@@ -358,23 +438,30 @@ export default function BookingView({
           </form>
         </div>
 
-
         {/* Active Appointments List Column */}
         <div className="lg:col-span-5 space-y-8 h-full">
           <div className="bg-white/35 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-white/50 space-y-6 shadow-lg">
             <h4 className="font-serif text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
-              <span className="material-symbols-outlined font-light text-primary">patient_list</span>
+              <span className="material-symbols-outlined font-light text-primary">
+                patient_list
+              </span>
               <span>Tus Solicitudes Guardadas</span>
             </h4>
-            
+
             <p className="text-xs text-slate-700 leading-relaxed font-bold">
-              Esta lista se almacena en el navegador de forma local (<strong>Durable persistence</strong>). Aquí puedes consultar y gestionar el estado del terapeuta clínico asignado:
+              Esta lista se almacena en el navegador de forma local (
+              <strong>Durable persistence</strong>). Aquí puedes consultar y
+              gestionar el estado del terapeuta clínico asignado:
             </p>
 
             {bookingsList.length === 0 ? (
               <div className="bg-white/55 backdrop-blur-xs p-8 rounded-2xl text-center border border-dashed border-white/65 space-y-2">
-                <span className="material-symbols-outlined text-4xl text-slate-450">event_busy</span>
-                <p className="text-xs text-slate-600 font-bold">No posees citas activas solicitadas.</p>
+                <span className="material-symbols-outlined text-4xl text-slate-400">
+                  event_busy
+                </span>
+                <p className="text-xs text-slate-600 font-bold">
+                  No posees citas activas solicitadas.
+                </p>
               </div>
             ) : (
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
@@ -390,41 +477,61 @@ export default function BookingView({
                       title="Cancelar esta cita"
                       id={`delete_booking_${bk.id}`}
                     >
-                      <span className="material-symbols-outlined text-lg font-light">delete</span>
+                      <span className="material-symbols-outlined text-lg font-light">
+                        delete
+                      </span>
                     </button>
 
                     <div className="space-y-1">
                       {/* Status indicator style */}
-                      <span className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold font-mono tracking-wider ${
-                        bk.status === "confirmed"
-                          ? "bg-emerald-100 border border-emerald-250 text-emerald-800"
-                          : "bg-amber-100 border border-amber-250 text-amber-800"
-                      }`}>
-                        {bk.status === "confirmed" ? "CONFIRMADO CLINICA" : "PENDIENTE REVISIÓN"}
+                      <span
+                        className={`inline-block px-2.5 py-0.5 rounded text-[10px] font-bold font-mono tracking-wider ${
+                          bk.status === "confirmed"
+                            ? "bg-emerald-100 border border-emerald-300 text-emerald-800"
+                            : "bg-amber-100 border border-amber-200 text-amber-800"
+                        }`}
+                      >
+                        {bk.status === "confirmed"
+                          ? "CONFIRMADO CLINICA"
+                          : "PENDIENTE REVISIÓN"}
                       </span>
-                      
-                      <h5 className="font-bold text-sm text-slate-900 pr-8">{bk.patientName}</h5>
-                      <p className="text-xs text-primary font-bold">{getServiceName(bk.serviceId)}</p>
+
+                      <h5 className="font-bold text-sm text-slate-900 pr-8">
+                        {bk.patientName}
+                      </h5>
+                      <p className="text-xs text-primary font-bold">
+                        {getServiceName(bk.serviceId)}
+                      </p>
                     </div>
 
                     <div className="text-[11px] text-slate-700 leading-relaxed space-y-1 border-t border-white/30 pt-2 font-semibold">
                       <p className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-slate-500 text-sm select-none">calendar_today</span>
+                        <span className="material-symbols-outlined text-slate-500 text-sm select-none">
+                          calendar_today
+                        </span>
                         <span>{bk.bookingDate}</span>
                       </p>
                       <p className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-slate-500 text-sm select-none">schedule</span>
+                        <span className="material-symbols-outlined text-slate-500 text-sm select-none">
+                          schedule
+                        </span>
                         <span>{getTimeLabel(bk.bookingTime)}</span>
                       </p>
                       <p className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-slate-500 text-sm select-none">pin_drop</span>
-                        <span className="truncate max-w-[210px]">{bk.patientAddress}, {bk.patientCity}</span>
+                        <span className="material-symbols-outlined text-slate-500 text-sm select-none">
+                          pin_drop
+                        </span>
+                        <span className="truncate max-w-[210px]">
+                          {bk.patientAddress}, {bk.patientCity}
+                        </span>
                       </p>
                     </div>
 
                     <div className="bg-white/60 p-2 rounded text-[11px] text-slate-800 border border-white/50 font-bold flex justify-between items-center">
                       <span>Precio estimado:</span>
-                      <strong className="text-primary font-extrabold">{formatPrice(bk.totalPrice, currency)}</strong>
+                      <strong className="text-primary font-extrabold">
+                        {formatPrice(bk.totalPrice, currency)}
+                      </strong>
                     </div>
                   </div>
                 ))}
@@ -435,22 +542,35 @@ export default function BookingView({
           {/* Quick FAQ info block */}
           <div className="bg-white/45 backdrop-blur-md p-6 rounded-[2rem] border border-white/50 shadow-md space-y-4">
             <h5 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-base font-black">forum</span>
+              <span className="material-symbols-outlined text-primary text-base font-black">
+                forum
+              </span>
               <span>Preguntas Frecuentes de Agenda</span>
             </h5>
             <div className="text-xs text-slate-700 leading-relaxed space-y-3 font-semibold">
               <div>
-                <p className="font-bold text-primary mb-1">¿Qué ocurre tras enviar el formulario?</p>
-                <p>Nuestra central clínica en Teruel verifica la disponibilidad del fisioterapeuta óptimo para tu lesión y te llamamos en un máximo de una hora para confirmar la reserva exactitud.</p>
+                <p className="font-bold text-primary mb-1">
+                  ¿Qué ocurre tras enviar el formulario?
+                </p>
+                <p>
+                  Nuestra central clínica en Teruel verifica la disponibilidad
+                  del fisioterapeuta óptimo para tu lesión y te llamamos en un
+                  máximo de una hora para confirmar la reserva exactitud.
+                </p>
               </div>
               <div>
-                <p className="font-bold text-primary mb-1">¿Cómo puedo pagar la sesión?</p>
-                <p>Puedes pagar directamente en efectivo al fisioterapeuta el día de la sesión, mediante Bizum corporativo, o mediante tarjeta de débito/crédito autorizada.</p>
+                <p className="font-bold text-primary mb-1">
+                  ¿Cómo puedo pagar la sesión?
+                </p>
+                <p>
+                  Puedes pagar directamente en efectivo al fisioterapeuta el día
+                  de la sesión, mediante Bizum corporativo, o mediante tarjeta de
+                  débito/crédito autorizada.
+                </p>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
