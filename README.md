@@ -95,6 +95,41 @@ Alias `@/*` → `src/*` (definido en `tsconfig.json`).
 `autoprefixer`, `esbuild`, `tsx`, `vite` y `@vitejs/plugin-react` no se usaban en
 `src/`. Se conservan `react`, `react-dom`, `tailwindcss` y `typescript`.
 
+## Comparativa de diseños candidatos: `/disenos`
+
+En `src/components/` hay diseños nuevos (`Servicios`, `Planes`, `Agendar` y sus
+copias con sufijo `2`). Se pueden ver funcionando en rutas propias:
+
+| URL | Componente |
+| --- | ---------- |
+| `/disenos` | índice comparativo con el contenido de cada diseño |
+| `/disenos/servicios` | `Servicios.tsx` (catálogo + checkers de síntomas) |
+| `/disenos/planes` | `Planes.tsx` (3 planes + simulador de precio) |
+| `/disenos/agendar` | `Agendar.tsx` (wizard de 4 pasos) |
+| `/disenos/agendar?servicio=deporte&plan=15` | el wizard con servicio y descuento ya elegidos |
+| `/disenos/servicios2`, `/disenos/planes2`, `/disenos/agendar2` | réplicas idénticas |
+
+Notas de implementación de esta zona de pruebas:
+
+- Los 6 ficheros **no se han tocado**: `Servicios2.tsx`, `Planes2.tsx` y
+  `Agendar2.tsx` son idénticos byte a byte a sus gemelos (verificado con `diff -q`
+  y `md5sum`), así que no hay decisión que tomar entre ellos.
+- Ninguno lleva `"use client"`. `src/components/DesignLabShell.tsx` sí lo lleva, y
+  al importarlos desde ahí quedan dentro del grafo de cliente: pueden usar `useState`
+  y `motion` sin editarlos.
+- `Agendar.tsx` genera el calendario con `new Date()` en el render, así que el shell
+  lo monta solo después del hydration para evitar el desajuste SSR/cliente.
+- `src/types.ts` es un shim mínimo que define `Tab`, el tipo que los candidatos
+  importan de `'../types'`. Si se adopta un diseño, cambia ese import a
+  `@/lib/types` y borra el shim.
+- `globals.css` define ahora `accent`, `accent-warm`, `accent-light`,
+  `primary-container` y `secondary-container` con valores **provisionales**
+  (los usaban ~90 clases de los candidatos y no existían en el tema).
+- `lucide-react` y `motion` volvieron al `package.json`: en la SPA original no se
+  usaban, estos diseños sí los importan.
+- La zona es no-indexable (`robots: { index: false }`) y no sustituye nada del
+  sitio real: `/servicios` y `/agendar` siguen con las vistas migradas.
+
 ## Pendientes a decidir por ti
 
 - `metadataBase` en `src/app/layout.tsx` usa `https://fisioteruel.com` como

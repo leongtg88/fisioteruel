@@ -10,6 +10,16 @@
   --color-surface-container-lowest: rgba(255, 255, 255, 0.7);
   --color-cream-bg: #eef2f6; /* Modern grey-blue canvas background */
   --color-on-surface-variant: #424653;
+
+  /* PROVISIONAL: tokens que usan los diseños candidatos de src/app/disenos
+     (Servicios / Planes / Agendar). No venían definidos en el tema original,
+     así que sus ~90 clases de color se quedaban sin estilo. Sustituir estos
+     valores por la paleta real si se conserva el tailwind.config de origen. */
+  --color-primary-container: #115e59; /* teal-800: hover sobre bg-primary */
+  --color-secondary-container: #dbeafe; /* azul suave para chips/badges */
+  --color-accent: #d97706; /* ámbar: descuentos y precios destacados */
+  --color-accent-warm: #c2410c; /* naranja quemado: llamadas de atención */
+  --color-accent-light: #fde68a; /* ámbar claro: halos/brillos decorativos */
 }
 
 /* Source Serif 4 y Work Sans se cargan con next/font (app/layout.tsx) y se

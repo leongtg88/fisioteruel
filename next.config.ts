@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
         hostname: "lh3.googleusercontent.com",
         pathname: "/aida-public/**",
       },
+      // Fotos de especialistas/ambientes que usan los diseños candidatos
+      // (src/components/Agendar.tsx y Planes.tsx, de momento con <img> nativo).
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
     ],
   },
 };
