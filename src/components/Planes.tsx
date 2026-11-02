@@ -2,6 +2,8 @@ import { useState, FormEvent } from 'react';
 import { Calendar, Check, HelpCircle, Info, Calculator, CreditCard, Landmark, Banknote, ShieldAlert, Sparkles, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Tab } from '../types';
+import { formatPrice } from '@/lib/format';
+import { THERAPY_PRICE_DOP } from '@/lib/prices';
 
 interface PlanesProps {
   onChangeTab: (tab: Tab) => void;
@@ -20,10 +22,10 @@ export default function Planes({ onChangeTab, onSelectServiceAndPlan }: PlanesPr
 
   // Therapy prices
   const therapies = {
-    trauma: { name: 'Traumatológica / Lesiones', price: 60, desc: 'Esguinces, fracturas, dolores musculares y post-operatorios.' },
-    deporte: { name: 'Fisioterapia Deportiva', price: 65, desc: 'Rendimiento, sobrecargas musculares, vendaje funcional.' },
-    neuro: { name: 'Neurorehabilitación', price: 70, desc: 'Ictus, Parkinson, Esclerosis. Ejercicios de control motor.' },
-    geriatrica: { name: 'Fisioterapia Geriátrica', price: 55, desc: 'Movilidad en mayores, prevención de caídas y equilibrio.' }
+    trauma: { name: 'Traumatológica / Lesiones', price: THERAPY_PRICE_DOP.trauma, desc: 'Esguinces, fracturas, dolores musculares y post-operatorios.' },
+    deporte: { name: 'Fisioterapia Deportiva', price: THERAPY_PRICE_DOP.deporte, desc: 'Rendimiento, sobrecargas musculares, vendaje funcional.' },
+    neuro: { name: 'Neurorehabilitación', price: THERAPY_PRICE_DOP.neuro, desc: 'Ictus, Parkinson, Esclerosis. Ejercicios de control motor.' },
+    geriatrica: { name: 'Fisioterapia Geriátrica', price: THERAPY_PRICE_DOP.geriatrica, desc: 'Movilidad en mayores, prevención de caídas y equilibrio.' }
   } as const;
 
   // Plan discounts
@@ -40,7 +42,6 @@ export default function Planes({ onChangeTab, onSelectServiceAndPlan }: PlanesPr
   const discountPct = planTiers[selectedPlanTier as keyof typeof planTiers].discount;
   const discountAmount = rawTotal * (discountPct / 100);
   const finalPrice = rawTotal - discountAmount;
-  const savedVal = discountAmount.toFixed(2);
 
   const handleApplyQuote = () => {
     if (onSelectServiceAndPlan) {
@@ -283,7 +284,7 @@ export default function Planes({ onChangeTab, onSelectServiceAndPlan }: PlanesPr
                     }`}
                   >
                     <span className="font-sans text-xs font-bold text-primary block">{item.name}</span>
-                    <span className="font-serif text-sm font-semibold text-text-dark inline-block mt-1">{item.price}€ / sesión</span>
+                    <span className="font-serif text-sm font-semibold text-text-dark inline-block mt-1">{formatPrice(item.price)} / sesión</span>
                     <span className="font-sans text-[11px] text-text-muted block mt-1 leading-tight">{item.desc}</span>
                   </button>
                 ))}
@@ -370,31 +371,31 @@ export default function Planes({ onChangeTab, onSelectServiceAndPlan }: PlanesPr
                   </div>
                   <div className="flex justify-between font-sans text-sm text-text-muted">
                     <span>Precio por sesión base:</span>
-                    <span className="font-semibold text-text-dark">{baseSessionPrice}€</span>
+                    <span className="font-semibold text-text-dark">{formatPrice(baseSessionPrice)}</span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between font-sans text-sm text-text-muted">
                     <span>Total sin descuento:</span>
-                    <span className="line-through text-text-muted">{rawTotal}€</span>
+                    <span className="line-through text-text-muted">{formatPrice(rawTotal)}</span>
                   </div>
                   
                   {discountPct > 0 && (
                     <div className="flex justify-between font-sans text-sm text-accent">
                       <span>Descuento ({discountPct}%):</span>
-                      <span className="font-bold">-{savedVal}€</span>
+                      <span className="font-bold">-{formatPrice(discountAmount)}</span>
                     </div>
                   )}
 
                   <div className="flex justify-between items-baseline pt-2">
                     <span className="font-sans text-base font-bold text-text-dark">Total aproximado:</span>
                     <span className="font-serif text-3xl sm:text-4xl font-extrabold text-primary">
-                      {finalPrice.toFixed(0)}€
+                      {formatPrice(finalPrice)}
                     </span>
                   </div>
                   <p className="font-sans text-[11px] text-text-muted text-right italic">
-                    ~ {Math.round(finalPrice / sessionCount)}€ la sesión en tu domicilio
+                    ~ {formatPrice(finalPrice / sessionCount)} la sesión en tu domicilio
                   </p>
                 </div>
               </div>

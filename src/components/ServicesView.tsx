@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useCurrency } from "@/components/CurrencyProvider";
 import { COMBOS_DATA, EXTRAS_DATA, SERVICES_DATA } from "@/lib/data";
 import { formatPrice } from "@/lib/format";
 import { ROUTES } from "@/lib/nav";
@@ -23,86 +22,92 @@ const SERVICE_ICONS: Record<string, string> = {
   "masaje-cuello": "accessibility",
 };
 
-const dopFormatter = new Intl.NumberFormat("es-DO", {
-  style: "currency",
-  currency: "DOP",
-  maximumFractionDigits: 0,
-});
+interface ServicesViewProps {
+  /**
+   * /servicios ya arranca con el hero del diseño de especialidades, así que
+   * aquí se omite el propio para no apilar dos cabeceras.
+   */
+  ocultarHero?: boolean;
+}
 
-export default function ServicesView() {
+export default function ServicesView({ ocultarHero = false }: ServicesViewProps) {
   const router = useRouter();
-  const { currency } = useCurrency();
 
   // Splitting data categories for clean presentation
   const PT_SERVICES = SERVICES_DATA.filter((s) => s.category === "fisioterapia");
   const MASSAGE_SERVICES = SERVICES_DATA.filter((s) => s.category === "masajes");
 
-  const goToBooking = (serviceId: string) => {
-    // El estado `selectedServiceId` de App.tsx viaja ahora por URL.
-    router.push(`${ROUTES.agendar}?servicio=${encodeURIComponent(serviceId)}`);
+  const goToBooking = () => {
+    // Los ids del catálogo antiguo (eval-integral, descarga-completa…) no
+    // existen en el asistente nuevo, que trabaja con trauma/deporte/
+    // geriatrica/neuro: se abre la reserva sin preselección.
+    router.push(ROUTES.agendar);
   };
 
   return (
     <div className="animate-fade-in max-w-[1280px] mx-auto px-6 py-12 flex flex-col gap-16 relative z-10">
-      {/* Services Hero Section */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        <div className="flex flex-col gap-6">
-          <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full w-fit text-xs font-bold tracking-wide border border-primary/20">
-            Bienestar a tu puerta
-          </span>
-          <h2 className="font-serif text-4xl sm:text-5xl lg:text-5xl text-slate-900 font-bold leading-tight">
-            Servicios de Salud con{" "}
-            <span className="text-primary italic font-serif">
-              Calidez Clínica
+      {/* Services Hero Section. Se oculta cuando esta vista se incrusta bajo
+          el catálogo nuevo de /servicios. */}
+      {!ocultarHero && (
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div className="flex flex-col gap-6">
+            <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full w-fit text-xs font-bold tracking-wide border border-primary/20">
+              Bienestar a tu puerta
             </span>
-          </h2>
-          <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-semibold">
-            Ofrecemos fisioterapia y masajes terapéuticos de alta gama en la
-            comodidad de tu hogar en Teruel Capital. Recupérate con expertos de
-            la salud colegiados sin tener que salir de casa o hacer filas de
-            espera.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <a
-              href="#pt-catalog"
-              className="bg-primary text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/35 hover:bg-primary/90 transition-all text-center"
-            >
-              Fisioterapia Domicilio
-            </a>
-            <a
-              href="#massage-catalog"
-              className="bg-white/45 backdrop-blur-md border border-white/60 text-primary px-8 py-3.5 rounded-xl text-sm font-bold hover:bg-white/65 hover:border-primary/20 transition-all text-center shadow-xs"
-            >
-              Masajes de Descarga
-            </a>
+            <h2 className="font-serif text-4xl sm:text-5xl lg:text-5xl text-slate-900 font-bold leading-tight">
+              Servicios de Salud con{" "}
+              <span className="text-primary italic font-serif">
+                Calidez Clínica
+              </span>
+            </h2>
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-semibold">
+              Ofrecemos fisioterapia y masajes terapéuticos de alta gama en la
+              comodidad de tu hogar en Teruel Capital. Recupérate con expertos de
+              la salud colegiados sin tener que salir de casa o hacer filas de
+              espera.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <a
+                href="#pt-catalog"
+                className="bg-primary text-white px-8 py-3.5 rounded-xl text-sm font-bold shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/35 hover:bg-primary/90 transition-all text-center"
+              >
+                Fisioterapia Domicilio
+              </a>
+              <a
+                href="#massage-catalog"
+                className="bg-white/45 backdrop-blur-md border border-white/60 text-primary px-8 py-3.5 rounded-xl text-sm font-bold hover:bg-white/65 hover:border-primary/20 transition-all text-center shadow-xs"
+              >
+                Masajes de Descarga
+              </a>
+            </div>
           </div>
-        </div>
 
-        {/* Hero image with a clean glass-card detail tag */}
-        <div className="relative h-[340px] sm:h-[450px] rounded-[2rem] overflow-hidden shadow-xl border border-white/30 group">
-          <Image
-            alt="Terapia manual y fisioterapia en salón residencial acogedor"
-            className="object-cover group-hover:scale-105 transition-transform duration-700"
-            src={CATALOG_IMAGE}
-            fill
-            sizes="(min-width: 768px) 50vw, 100vw"
-            unoptimized
-          />
-          <div className="absolute bottom-6 left-6 bg-white/60 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4 border border-white/60 shadow-md shadow-slate-900/5">
-            <div className="bg-primary/10 p-2.5 rounded-full text-primary flex items-center justify-center">
-              <span className="material-symbols-outlined text-2xl">house</span>
-            </div>
-            <div>
-              <p className="font-bold text-sm text-slate-900">
-                Servicio en Teruel capital
-              </p>
-              <p className="text-xs text-slate-700 font-semibold">
-                Atención domiciliaria 100% segura
-              </p>
+          {/* Hero image with a clean glass-card detail tag */}
+          <div className="relative h-[340px] sm:h-[450px] rounded-[2rem] overflow-hidden shadow-xl border border-white/30 group">
+            <Image
+              alt="Terapia manual y fisioterapia en salón residencial acogedor"
+              className="object-cover group-hover:scale-105 transition-transform duration-700"
+              src={CATALOG_IMAGE}
+              fill
+              sizes="(min-width: 768px) 50vw, 100vw"
+              unoptimized
+            />
+            <div className="absolute bottom-6 left-6 bg-white/60 backdrop-blur-md p-4 rounded-2xl flex items-center gap-4 border border-white/60 shadow-md shadow-slate-900/5">
+              <div className="bg-primary/10 p-2.5 rounded-full text-primary flex items-center justify-center">
+                <span className="material-symbols-outlined text-2xl">house</span>
+              </div>
+              <div>
+                <p className="font-bold text-sm text-slate-900">
+                  Servicio en Teruel capital
+                </p>
+                <p className="text-xs text-slate-700 font-semibold">
+                  Atención domiciliaria 100% segura
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* PT Catalog Section */}
       <section className="flex flex-col gap-8 scroll-mt-24" id="pt-catalog">
@@ -173,16 +178,11 @@ export default function ServicesView() {
                       : "Precio por sesión"}
                   </span>
                   <span className="font-serif text-2xl font-bold text-primary">
-                    {formatPrice(serv.price, currency)}
-                    <span className="text-xs text-slate-500 font-sans font-normal ml-1">
-                      {currency === "EUR"
-                        ? `(${dopFormatter.format(serv.price)})`
-                        : `(${formatPrice(serv.price, "EUR")})`}
-                    </span>
+                    {formatPrice(serv.price)}
                   </span>
                 </div>
                 <button
-                  onClick={() => goToBooking(serv.id)}
+                  onClick={() => goToBooking()}
                   className="bg-primary text-white px-7 py-2.5 rounded-xl text-sm font-bold shadow-md shadow-primary/25 cursor-pointer hover:bg-primary/95 hover:shadow-lg transition-all"
                 >
                   Reservar
@@ -229,7 +229,7 @@ export default function ServicesView() {
             {MASSAGE_SERVICES.map((m) => (
               <button
                 key={m.id}
-                onClick={() => goToBooking(m.id)}
+                onClick={() => goToBooking()}
                 className="bg-white/45 backdrop-blur-sm p-5 rounded-2xl flex items-center justify-between hover:bg-white/60 hover:shadow-md transition-all duration-300 border border-white/40 cursor-pointer group text-left w-full"
               >
                 <div className="flex items-center gap-4">
@@ -250,7 +250,7 @@ export default function ServicesView() {
 
                 <div className="text-right flex-shrink-0 ml-4">
                   <span className="font-serif text-lg sm:text-xl font-bold text-primary block">
-                    {formatPrice(m.price, currency)}
+                    {formatPrice(m.price)}
                   </span>
                   {m.badge ? (
                     <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5 block group-hover:text-secondary">
@@ -337,11 +337,11 @@ export default function ServicesView() {
                   Sesión Combinada Especial de 90 min
                 </span>
                 <span className="font-serif text-4xl font-bold">
-                  {formatPrice(COMBOS_DATA[0].price, currency)}
+                  {formatPrice(COMBOS_DATA[0].price)}
                 </span>
               </div>
               <button
-                onClick={() => goToBooking(COMBOS_DATA[0].id)}
+                onClick={() => goToBooking()}
                 className="bg-white text-primary font-bold text-sm px-8 py-3 rounded-xl hover:shadow-xl hover:bg-slate-50 transition-all cursor-pointer transform hover:-translate-y-px active:translate-y-0"
               >
                 Lo quiero
@@ -374,7 +374,7 @@ export default function ServicesView() {
                       </span>
                     </div>
                     <span className="text-secondary font-bold text-sm">
-                      +{formatPrice(extra.price, currency)}
+                      +{formatPrice(extra.price)}
                     </span>
                   </div>
                 ))}
@@ -407,10 +407,10 @@ export default function ServicesView() {
 
             <div className="mt-8 flex flex-col gap-3">
               <span className="font-serif text-3xl font-bold">
-                {formatPrice(COMBOS_DATA[1].price, currency)}
+                {formatPrice(COMBOS_DATA[1].price)}
               </span>
               <button
-                onClick={() => goToBooking(COMBOS_DATA[1].id)}
+                onClick={() => goToBooking()}
                 className="w-full bg-white text-secondary text-center text-sm font-bold py-3 rounded-xl hover:bg-slate-50 transition-all cursor-pointer shadow-md"
               >
                 Agendar Sesión

@@ -2,6 +2,8 @@ import { useState, FormEvent } from 'react';
 import { Sparkles, ArrowRight, ShieldCheck, Heart, User, Check, Flame, Accessibility, Dumbbell, ShieldAlert, Sparkle, CircleCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Tab } from '../types';
+import { formatPrice } from '@/lib/format';
+import { THERAPY_PRICE_DOP } from '@/lib/prices';
 
 interface ServiciosProps {
   onChangeTab: (tab: Tab) => void;
@@ -24,7 +26,7 @@ export default function Servicios({ onChangeTab, onSelectServiceAndPlan }: Servi
     {
       id: 'trauma',
       title: 'Fisioterapia Traumatológica & Ortopédica',
-      price: 60,
+      price: THERAPY_PRICE_DOP.trauma,
       duration: '55 mins',
       desc: 'Rehabilitación y alivio eficaz para patologías del aparato locomotor, dolores de columna y articulaciones.',
       features: ['Esguinces, tendinitis y luxaciones', 'Dolor de espalda crónico (Lumbago, ciática)', 'Fisioterapia y masajes post-fracturas', 'Tratamiento post-operatorio inmediato'],
@@ -35,7 +37,7 @@ export default function Servicios({ onChangeTab, onSelectServiceAndPlan }: Servi
     {
       id: 'deporte',
       title: 'Fisioterapia Deportiva',
-      price: 65,
+      price: THERAPY_PRICE_DOP.deporte,
       duration: '50 mins',
       desc: 'Prevención de lesiones y readaptación física avanzada para atletas amateurs, profesionales y corredores de montaña.',
       features: ['Roturas de fibras y distensiones', 'Descarga muscular post-entrenamiento', 'Kinesiotaping y vendajes funcionales', 'Optimización del gesto técnico deportivo'],
@@ -46,7 +48,7 @@ export default function Servicios({ onChangeTab, onSelectServiceAndPlan }: Servi
     {
       id: 'geriatrica',
       title: 'Fisioterapia Geriátrica & Tercera Edad',
-      price: 55,
+      price: THERAPY_PRICE_DOP.geriatrica,
       duration: '60 mins',
       desc: 'Mantenimiento preventivo, potenciación muscular cuidadosa y mejora de la marcha para mayores de 65 años.',
       features: ['Re-entrenamiento del equilibrio y balance', 'Prevención activa de caídas domésticas', 'Alivio del dolor por artrosis o artritis', 'Preservación de la movilidad autónoma'],
@@ -57,7 +59,7 @@ export default function Servicios({ onChangeTab, onSelectServiceAndPlan }: Servi
     {
       id: 'neuro',
       title: 'Fisioterapia Neurológica especializada',
-      price: 70,
+      price: THERAPY_PRICE_DOP.neuro,
       duration: '60 mins',
       desc: 'Estimulación neuromuscular especializada para pacientes con afecciones del sistema nervioso central o periférico.',
       features: ['Secuelas de Ictus (Accidente Cerebrovascular)', 'Esclerosis Múltiple y ELA', 'Facilitación neuromuscular propioceptiva', 'Ejercicios de coordinación motora fina'],
@@ -157,7 +159,7 @@ export default function Servicios({ onChangeTab, onSelectServiceAndPlan }: Servi
                 </h3>
                 <div className="text-right shrink-0">
                   <span className="font-serif text-2xl font-extrabold text-primary block leading-none">
-                    {svc.price}€
+                    {formatPrice(svc.price)}
                   </span>
                   <span className="font-sans text-[11px] text-text-muted mt-1 inline-block">
                     {svc.duration} / sesión

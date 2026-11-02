@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Source_Serif_4, Work_Sans } from "next/font/google";
 import "./globals.css";
-import { CurrencyProvider } from "@/components/CurrencyProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -69,22 +68,20 @@ export default function RootLayout({
         <link rel="stylesheet" href={MATERIAL_SYMBOLS_HREF} />
       </head>
       <body className="bg-cream-bg text-[#161b28] font-sans">
-        <CurrencyProvider>
-          <div className="min-h-screen flex flex-col justify-between bg-cream-bg font-sans relative overflow-x-hidden">
-            {/* Mesh Background Elements from Frosted Glass Theme */}
-            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-              <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] bg-blue-300 rounded-full blur-[120px] opacity-25"></div>
-              <div className="absolute bottom-[5%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] bg-teal-200 rounded-full blur-[110px] opacity-35"></div>
-              <div className="absolute top-[35%] right-[15%] w-[35vw] h-[35vw] max-w-[400px] bg-indigo-200 rounded-full blur-[130px] opacity-20"></div>
-            </div>
-
-            <div className="relative z-10 flex flex-col justify-between flex-1 min-h-screen">
-              <Header />
-              <main className="flex-grow pb-16 relative z-10">{children}</main>
-              <Footer />
-            </div>
+        <div className="min-h-screen flex flex-col justify-between bg-cream-bg font-sans relative overflow-x-hidden">
+          {/* Mesh Background Elements from Frosted Glass Theme */}
+          <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+            <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] bg-blue-300 rounded-full blur-[120px] opacity-25"></div>
+            <div className="absolute bottom-[5%] right-[-5%] w-[45vw] h-[45vw] max-w-[500px] bg-teal-200 rounded-full blur-[110px] opacity-35"></div>
+            <div className="absolute top-[35%] right-[15%] w-[35vw] h-[35vw] max-w-[400px] bg-indigo-200 rounded-full blur-[130px] opacity-20"></div>
           </div>
-        </CurrencyProvider>
+
+          <div className="relative z-10 flex flex-col justify-between flex-1 min-h-screen">
+            <Header />
+            <main className="flex-grow pb-16 relative z-10">{children}</main>
+            <Footer />
+          </div>
+        </div>
       </body>
     </html>
   );

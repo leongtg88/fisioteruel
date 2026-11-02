@@ -3,18 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useCurrency } from "@/components/CurrencyProvider";
 import DesignsDropdown from "@/components/DesignsDropdown";
 import { NAV_ITEMS, ROUTES, routeKeyFromPathname } from "@/lib/nav";
 
 export default function Header() {
   const pathname = usePathname();
   const currentRoute = routeKeyFromPathname(pathname);
-  const { currency, setCurrency } = useCurrency();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // El drawer debe cerrarse al cambiar de ruta (antes bastaba con el onClick
-  // porque no existían navegaciones reales).
+  // El drawer debe cerrarse al cambiar de ruta.
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
@@ -64,72 +61,39 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-6">
             {NAV_ITEMS.map((item) => {
               const isActive = currentRoute === item.key;
-              const inactiveClasses = item.highlight
-                ? "text-amber-700 font-bold border-transparent hover:text-amber-800"
-                : "text-slate-600 border-transparent hover:text-primary hover:border-primary/40";
-
               return (
                 <Link
                   key={item.key}
                   href={ROUTES[item.key]}
                   aria-current={isActive ? "page" : undefined}
-                  className={`font-semibold text-sm tracking-wide transition-all py-1.5 border-b-2 flex items-center gap-1 ${
+                  className={`font-semibold text-sm tracking-wide transition-all py-1.5 border-b-2 cursor-pointer ${
                     isActive
                       ? "text-primary border-primary font-bold"
-                      : inactiveClasses
+                      : "text-slate-600 border-transparent hover:text-primary hover:border-primary/40"
                   }`}
                   id={`nav_${item.key}_btn`}
                 >
-                  {item.highlight && (
-                    <span className="material-symbols-outlined text-xs">
-                      {item.drawerIcon}
-                    </span>
-                  )}
-                  <span>{item.label}</span>
+                  {item.label}
                 </Link>
               );
             })}
 
             {/* Candidatos de rediseño (Comparativa /disenos). A partir de lg:
-                por debajo de ese ancho no cabe todo el menú y se accede desde
-                el drawer móvil. */}
+                por debajo de ese ancho no cabe todo el menú y ya se accede
+                desde el drawer. */}
             <div className="hidden lg:block">
               <DesignsDropdown variant="desktop" />
             </div>
           </div>
 
-          {/* Right actions: Currency selector & Agenda Button */}
+          {/* Right action: CTA */}
           <div className="flex items-center gap-4">
-            {/* Elegant currency switcher pill - Frosted style */}
-            <div className="bg-white/55 backdrop-blur-xs p-0.5 rounded-full flex border border-white/60 shadow-xs">
-              {(["EUR", "DOP"] as const).map((code) => (
-                <button
-                  key={code}
-                  onClick={() => setCurrency(code)}
-                  aria-pressed={currency === code}
-                  className={`px-3 py-1 rounded-full text-[11px] font-bold tracking-wide transition-all ${
-                    currency === code
-                      ? "bg-primary text-white shadow-sm"
-                      : "text-slate-600 hover:text-primary hover:bg-white/40"
-                  }`}
-                  title={
-                    code === "EUR"
-                      ? "Mostrar precios en Euros (España)"
-                      : "Mostrar precios en Pesos Dominicanos (como en el mockup original)"
-                  }
-                  id={`currency_${code.toLowerCase()}_btn`}
-                >
-                  {code === "EUR" ? "€ EUR" : "$ DOP"}
-                </button>
-              ))}
-            </div>
-
             <Link
               href={ROUTES.agendar}
               className="bg-primary text-white px-5 py-2.5 rounded-full text-xs font-bold tracking-wide hover:bg-primary/90 transition-all shadow-md shadow-primary/10 hover:shadow-lg hover:shadow-primary/20 hover:-translate-y-px active:translate-y-0"
               id="header_agendar_pillo"
             >
-              Agendar
+              Reservar cita
             </Link>
           </div>
         </nav>
@@ -173,20 +137,15 @@ export default function Header() {
           <div className="flex flex-col gap-2">
             {NAV_ITEMS.map((item) => {
               const isActive = currentRoute === item.key;
-              const inactiveClasses = item.highlight
-                ? "text-amber-800 font-medium hover:bg-slate-50"
-                : "text-on-surface-variant hover:bg-slate-50";
-              const activeClasses = item.highlight
-                ? "bg-amber-50 text-amber-900 border border-amber-200/50"
-                : "bg-[#e9edff] text-[#2f4b85]";
-
               return (
                 <Link
                   key={item.key}
                   href={ROUTES[item.key]}
                   aria-current={isActive ? "page" : undefined}
                   className={`w-full py-3 px-4 rounded-xl flex items-center gap-4 text-sm font-semibold transition-colors text-left ${
-                    isActive ? activeClasses : inactiveClasses
+                    isActive
+                      ? "bg-[#e9edff] text-[#2f4b85]"
+                      : "text-on-surface-variant hover:bg-slate-50"
                   }`}
                   id={`drawer_nav_${item.key}`}
                 >

@@ -1,16 +1,5 @@
 import Link from "next/link";
-import { ROUTES } from "@/lib/nav";
-
-const FOOTER_LINKS: { href: string; label: string; highlight?: boolean }[] = [
-  { href: ROUTES.inicio, label: "Inicio - Bienvenida" },
-  { href: ROUTES.servicios, label: "Nuestros Servicios y Tarifas" },
-  { href: ROUTES.agendar, label: "Agenda de Turno de Terapia" },
-  {
-    href: ROUTES.descargar,
-    label: "Código Fuente Standalone (.HTML)",
-    highlight: true,
-  },
-];
+import { NAV_ITEMS, ROUTES } from "@/lib/nav";
 
 export default function Footer() {
   return (
@@ -44,18 +33,14 @@ export default function Footer() {
             Enlaces Rápidos
           </span>
           <div className="flex flex-col gap-2">
-            {FOOTER_LINKS.map((link) => (
+            {NAV_ITEMS.map((item) => (
               <Link
-                key={link.href}
-                href={link.href}
-                className={`text-left text-sm hover:text-primary transition-colors ${
-                  link.highlight
-                    ? "text-amber-800 font-bold hover:underline"
-                    : "text-slate-600 font-semibold"
-                }`}
-                id={`footer_link_${link.href.replace("/", "") || "inicio"}`}
+                key={item.key}
+                href={ROUTES[item.key]}
+                className="text-left text-sm text-slate-600 font-semibold hover:text-primary transition-colors"
+                id={`footer_link_${item.key}`}
               >
-                {link.label}
+                {item.drawerLabel}
               </Link>
             ))}
           </div>

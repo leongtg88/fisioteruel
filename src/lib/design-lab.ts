@@ -13,7 +13,7 @@ export interface CandidateMeta {
   /** fichero real en src/components */
   file: string;
   kind: CandidateKind;
-  /** ruta de la versión actual en producción, para comparar */
+  /** ruta donde este diseño está publicado ya en el sitio real */
   livePath: string;
   summary: string;
   highlights: string[];
@@ -46,7 +46,7 @@ export const CANDIDATES: CandidateMeta[] = [
     title: "Planes",
     file: "src/components/Planes.tsx",
     kind: "planes",
-    livePath: "/servicios",
+    livePath: "/planes",
     icon: "card_membership",
     summary:
       "Página comercial de bonos: tres planes por volumen, simulador de precio en vivo, métodos de pago y buzón de consultas.",

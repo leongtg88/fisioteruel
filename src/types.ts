@@ -1,12 +1,16 @@
 /**
- * Re-export para los componentes de la línea de diseño candidata
- * (`Servicios`, `Planes`, `Agendar`), que importan `{ Tab } from "../types"`.
+ * Re-export para los componentes candidatos (`Servicios`, `Planes`, `Agendar`),
+ * que importan `{ Tab } from "../types"`.
  *
- * El tipos "de verdad" del proyecto vive en `src/lib/types.ts`; este archivo
- * solo existía para no tener que editar los ficheros candidatos. Si uno de
- * estos diseños se adopta como definitivo, cambia el import a `@/lib/types`
- * y borra este shim.
+ * `Tab` es simplemente una de las rutas del sitio, así que los valores que
+ * estos componentes pasan a `onChangeTab` (`'inicio'`, `'agendar'`) siguen
+ * siendo válidos. El origen de verdad está en `src/lib/nav.ts`.
+ *
+ * Si algún día se reescriben los candidatos para usar `Link` de Next, este shim
+ * se puede borrar.
  */
-export type Tab = "inicio" | "servicios" | "planes" | "agendar" | "descargar";
+import type { RouteKey } from "@/lib/nav";
+
+export type Tab = RouteKey;
 
 export * from "@/lib/types";

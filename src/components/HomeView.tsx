@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCurrency } from "@/components/CurrencyProvider";
 import { ROUTES } from "@/lib/nav";
 import { formatPrice } from "@/lib/format";
 
@@ -52,7 +51,6 @@ const QUALITY_LIST = [
 ];
 
 export default function HomeView() {
-  const { currency } = useCurrency();
 
   return (
     <div className="animate-fade-in relative z-10">
@@ -198,9 +196,8 @@ export default function HomeView() {
                 Primera evaluación física completa a domicilio con diseño de plan
                 correctivo personalizado por solo{" "}
                 <span className="font-extrabold text-amber-300 text-xl sm:text-2xl">
-                  {formatPrice(5500, currency)}
+                  {formatPrice(5500)}
                 </span>
-                {currency === "EUR" ? " (5.500 DOP$)" : " (65 €)"}
               </p>
             </div>
             <div className="flex-shrink-0">

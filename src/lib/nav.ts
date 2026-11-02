@@ -1,12 +1,16 @@
 /**
- * Mapa de rutas del App Router. Sustituye al antiguo `ScreenType` + `useState`
- * que gestionaba la navegación como una SPA.
+ * Navegación principal. Los candidatos ya adoptados (especialidades, planes y
+ * asistente) definen qué se enlaza.
  */
+
+/** Rutas del sitio. */
 export const ROUTES = {
   inicio: "/",
   servicios: "/servicios",
+  planes: "/planes",
   agendar: "/agendar",
-  descargar: "/descargar",
+  /** Formulario antiguo (localStorage). Existe, pero no se enlaza. */
+  reservas: "/reservas",
 } as const;
 
 export type RouteKey = keyof typeof ROUTES;
@@ -18,10 +22,16 @@ export interface NavItem {
   drawerLabel: string;
   /** Icono Material Symbols para el drawer móvil */
   drawerIcon: string;
-  /** Variante visual destacada (Exportar HTML) */
-  highlight?: boolean;
 }
 
+/**
+ * Navegación visible.
+ *
+ * Se quitaron dos accesos a petición del cliente: "Exportar HTML" (la página
+ * `/descargar` ya no existe) y "Agenda Online" (el formulario viejo sigue vivo
+ * en `/reservas`, sin enlace). La pestaña "Agendar" es ahora el asistente de 4
+ * pasos del diseño candidato.
+ */
 export const NAV_ITEMS: NavItem[] = [
   {
     key: "inicio",
@@ -36,17 +46,16 @@ export const NAV_ITEMS: NavItem[] = [
     drawerIcon: "rebase_edit",
   },
   {
-    key: "agendar",
-    label: "Agenda Online",
-    drawerLabel: "Agenda Online",
-    drawerIcon: "calendar_month",
+    key: "planes",
+    label: "Planes",
+    drawerLabel: "Planes y Bonos",
+    drawerIcon: "card_membership",
   },
   {
-    key: "descargar",
-    label: "Exportar HTML",
-    drawerLabel: "Exportar HTML Standalone",
-    drawerIcon: "deployed_code",
-    highlight: true,
+    key: "agendar",
+    label: "Agendar",
+    drawerLabel: "Agendar cita",
+    drawerIcon: "calendar_month",
   },
 ];
 

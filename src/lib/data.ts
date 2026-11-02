@@ -108,5 +108,3 @@ export const EXTRAS_DATA = [
     icon: "fluid_med"
   }
 ];
-
-export const CURRENCY_CONVERSION_RATE = 0.016; // 1 DOP = approximately 0.016 EUR

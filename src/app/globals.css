@@ -20,6 +20,8 @@
   --color-accent: #d97706; /* ámbar: descuentos y precios destacados */
   --color-accent-warm: #c2410c; /* naranja quemado: llamadas de atención */
   --color-accent-light: #fde68a; /* ámbar claro: halos/brillos decorativos */
+  --color-text-dark: #16212b; /* usado 60 veces por los candidatos */
+  --color-text-muted: #41484f; /* usado 58 veces por los candidatos */
 }
 
 /* Source Serif 4 y Work Sans se cargan con next/font (app/layout.tsx) y se

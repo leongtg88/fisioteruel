@@ -11,139 +11,141 @@ pnpm install     # instala dependencias (lockfile: pnpm-lock.yaml)
 pnpm dev         # servidor de desarrollo en http://localhost:3000
 ```
 
-| Comando           | Qué hace                                        |
-| ----------------- | ----------------------------------------------- |
-| `pnpm dev`        | Desarrollo con Turbopack, puerto 3000           |
-| `pnpm build`      | Build de producción                             |
-| `pnpm start`      | Sirve el build                                    |
-| `pnpm typecheck`  | Comprobación de tipos (`tsc --noEmit`)            |
+| Comando           | Qué hace                                       |
+| ----------------- | ---------------------------------------------- |
+| `pnpm dev`        | Desarrollo con Turbopack, puerto 3000          |
+| `pnpm build`      | Build de producción                            |
+| `pnpm start`      | Sirve el build                                 |
+| `pnpm typecheck`  | Comprobación de tipos (`tsc --noEmit`)         |
 
 No hay variables de entorno obligatorias: las antiguas `GEMINI_API_KEY` y
 `APP_URL` se usaban con dependencias que ya no están en el proyecto.
 
-## Rutas
+## Rutas y navegación
 
 La navegación por pantallas (`ScreenType` + `useState` en `App.tsx`) se convirtió
-en rutas reales del App Router:
+en rutas reales del App Router. El menú enlaza cuatro cosas:
 
-| Ruta         | Página                                             |
-| ------------ | -------------------------------------------------- |
-| `/`          | Inicio (hero, showcase de servicios, CTA, calidad) |
-| `/servicios` | Catálogo de servicios, combos y extras             |
-| `/agendar`   | Formulario de reserva y listado de citas locales   |
-| `/descargar` | Visor de las plantillas HTML standalone            |
-| `/disenos/*` | Comparativa de los 3 diseños candidatos (noindex) |
+| Ruta              | Página                                                              |
+| ----------------- | ------------------------------------------------------------------- |
+| `/`               | Inicio: hero, showcase de servicios, CTA y estándar de cuidado       |
+| `/servicios`      | Especialidades del diseño adoptado **+** masajes, combos y extras    |
+| `/planes`         | Planes y bonos, con simulador de precio                              |
+| `/agendar`        | Asistente de reserva en 4 pasos                                      |
+| `/reservas`       | Formulario antiguo (guarda citas en `localStorage`), **sin enlace**  |
+| `/disenos/*`      | Los 3 diseños sueltos para revisarlos (noindex)                      |
 
-Detalles del mapeo:
+Quitados del header y del drawer: **"Exportar HTML"** (la página `/descargar` ya
+no existe) y **"Agenda Online"** (el formulario viejo vive en `/reservas`).
 
-- **Moneda (EUR/DOP)**: el `useState` de `App.tsx` ahora vive en
-  `src/components/CurrencyProvider.tsx` (provider del layout raíz), persistida en
-  `localStorage` y leída tras el montaje para evitar desajustes de hidratación.
-- **Servicio preseleccionado**: el estado `selectedServiceId` viajaba por props;
-  ahora viaja por URL (`/agendar?servicio=descarga-completa`), lo que hace que la
-  reserva sea compartible.
-- **Scroll a secciones**: los botones "Saber más" usan enlaces con ancla
-  (`/servicios#masajes`) en lugar de `setState` + `setTimeout` + `scrollIntoView`.
-- **Imágenes**: los `<img>` remotos pasaron a `next/image` con `fill`; el hostname
-  `lh3.googleusercontent.com` está allowlisteado en `next.config.ts`
-  (`images.remotePatterns`) y se marcan como `unoptimized` para no depender del
-  optimizador externo. El hero usa `preload` (en Next 16 `priority` está
-  deprecado en favor de `preload`).
-- **Tipografías**: Source Serif 4 y Work Sans se autohospedan con
-  `next/font/google` y se exponen como variables CSS consumidas desde
-  `@theme inline` en `src/app/globals.css`. Material Symbols Outlined se sigue
-  cargando por `<link>` desde el CDN de Google Fonts (necesita los ejes variables
-  `FILL`/`GRAD`/`opsz` y no está disponible en `next/font`).
-- **Render por petición**: `/descargar` lee las plantillas de disco con
-  `connection()` de `next/server`; en Next 16 el `export const dynamic =
-  "force-dynamic"` de la página se considera la vía antigua.
-- **Scroll**: `scroll-behavior: smooth` en `html` + `data-scroll-behavior="smooth"`
-  en `<html>` para conservar el scroll suave de los anclajes internos sin
-  enlentecer los cambios de ruta (cambio de comportamiento en Next 16).
-- **SEO**: `index.html` ya no existe; el `<title>`/description viven en la API
-  `Metadata` del layout y de cada página.
-- **Plantillas standalone**: `/descargar` muestra el contenido real de
-  `public/templates/` leído en el servidor (antes el código estaba duplicado como
-  string literal dentro del componente).
+## Cómo encajan los diseños nuevos
+
+`Servicios.tsx`, `Planes.tsx` y `Agendar.tsx` llegaron como componentes de SPA
+(`onChangeTab`, `onSelectServiceAndPlan`, precios en euros, `motion`,
+`lucide-react`) y se adoptaron así:
+
+- **No hacen falta ediciones para que funcionen en Next**: `CandidateShell.tsx`
+  es el único `"use client"` de esa cadena, y sus props (`onChangeTab`, etc.) se
+  cablean a `router.push` con `ROUTES`. Con `mode="lab"` navegan por `/disenos/*`
+  y con `mode="site"` (el valor por defecto) por el sitio real.
+- **Un mismo componente, dos destinos**: `/servicios`, `/planes` y `/agendar`
+  usan el shell en modo `site`; `/disenos/{servicios,planes,agendar}` en modo
+  `lab`. Los prototipos siguen visibles para comparar.
+- **`Agendar.tsx` se monta solo en cliente**: construye el calendario con
+  `new Date()` durante el render y partirlo del servidor daría un desajuste de
+  hidratación. El shell muestra un marcador hasta el `useEffect` de montaje.
+- **`src/types.ts`** es un shim que define `Tab` (ahora un alias de `RouteKey`),
+  el tipo que los candidatos importan de `'../types'`.
+- **Moneda única RD$**: se quitó el conmutador € / \$ y su provider.
+  `formatPrice()` (`src/lib/format.ts`) emite `RD$ 3,750`, y las tarifas por
+  especialidad están en `src/lib/prices.ts`.
+- **`/servicios` fusionado**: arriba el bloque de especialidades del candidato;
+  debajo `ServicesView` con `ocultarHero` para no apilar dos cabeceras. Sus
+  anclas (`#fisioterapia`, `#masajes`, `#combos`) siguen sirviendo los "Saber
+  más" del Inicio.
+
+## Decisión pendiente: los 4 precios
+
+Los candidatos venían en euros (60 / 65 / 55 / 70 €). Los traduje a RD$ con el
+tipo de cambio que el propio proyecto declaraba (`1 € ≈ 62,5 RD$`) y los dejé en
+`src/lib/prices.ts`:
+
+| Especialidad   | RD$   |
+| -------------- | ----- |
+| Traumatológica | 3 750 |
+| Deportiva      | 4 050 |
+| Geriátrica     | 3 450 |
+| Neurológica    | 4 400 |
+
+**Es un cálculo mío, no una tarifa tuya.** Cambiarlas es tocar solo ese fichero.
 
 ## Estructura
 
 ```
 src/
-  app/            layout, globals.css y una carpeta por ruta
-  components/      Header, Footer, vistas y CurrencyProvider
-  lib/             data.ts (catálogo), types.ts, format.ts, nav.ts
-public/templates/  plantillas HTML standalone + header-footer.js
+  app/           layout, globals.css y una carpeta por ruta
+                 (/, /servicios, /planes, /agendar, /reservas, /disenos)
+  components/    Header, Footer, CandidateShell, DesignsDropdown,
+                 vistas migradas (HomeView, ServicesView, BookingView)
+                 y los 3 candidatos (Servicios, Planes, Agendar)
+  lib/           nav.ts, data.ts, prices.ts, format.ts, types.ts, design-lab.ts
+  types.ts       shim con `Tab` para los componentes candidatos
+public/templates/ plantillas HTML standalone (sin página que las muestre)
 ```
 
 Alias `@/*` → `src/*` (definido en `tsconfig.json`).
 
-## Diferencias de comportamiento conocidas
+## Detalles técnicos de la migración a Next 16
 
-- `/servicios` y `/agendar` son rutas separadas: el botón "Reservar" navega en
-  lugar de intercambiar el contenido en memoria, y el navegador conserva el
-  historial (atrás/adelante funcionan).
-- El listado de citas guardadas sigue siendo `localStorage`: es solo local al
-  navegador y no se envía a ningún backend (igual que antes).
-- Se corrigieron clases Tailwind inexistentes (`text-slate-850`, `text-amber-750`,
-  `text-2.5xl`, `border-emerald-250`, `duration-350`…) y se añadió el token
-  `--color-on-surface-variant` y la animación `animate-fade-in`, que se usaban pero
-  no estaban definidos. Estos elementos ahora sí muestran su color/animación.
+- **Imágenes**: los `<img>` remotos pasaron a `next/image` con `fill`;
+  `lh3.googleusercontent.com` e `images.unsplash.com` están allowlisteados en
+  `next.config.ts` (`images.remotePatterns`). Las de Google se marcan
+  `unoptimized` para no depender del optimizador externo. El hero usa `preload`
+  (en Next 16 `priority` está deprecado en su favor).
+- **Tipografías**: Source Serif 4 y Work Sans se autohospedan con
+  `next/font/google` y se exponen como variables CSS consumidas desde
+  `@theme inline` en `globals.css`. Material Symbols Outlined se carga por
+  `<link>` desde el CDN: necesita los ejes variables `FILL`/`GRAD`/`opsz` y no
+  está disponible en `next/font`.
+- **Scroll**: `scroll-behavior: smooth` en `html` más
+  `data-scroll-behavior="smooth"` en `<html>`, para que los anclajes internos se
+  deslicen sin enlentecer los cambios de ruta (Next 16 ya no supera tu CSS).
+- **SEO**: `index.html` desapareció; título y descripción viven en la API
+  `Metadata` del layout y de cada página.
+- **Tokens añadidos al tema**: `on-surface-variant`, `accent`, `accent-warm`,
+  `accent-light`, `primary-container`, `secondary-container`, `text-dark` y
+  `text-muted`. Los siete últimos los usaban los candidatos 183 veces sin estar
+  definidos; sus valores hex son **provisionales**, míos. Si conservas el
+  `tailwind.config` de donde salieron, pásamelo y lo sustituyo.
+- **Corregidos** además de lo anterior: clases Tailwind inexistentes
+  (`text-slate-850`, `border-emerald-250`, `duration-350`…) y la animación
+  `animate-fade-in`, que se usaba pero no estaba definida.
 
-## Deps eliminadas en la migración
+## Dependencias
 
-`@google/genai`, `express`, `@types/express`, `dotenv`, `motion`, `lucide-react`,
-`autoprefixer`, `esbuild`, `tsx`, `vite` y `@vitejs/plugin-react` no se usaban en
-`src/`. Se conservan `react`, `react-dom`, `tailwindcss` y `typescript`.
+Se fueron las que no usaba nadie: `@google/genai`, `express`, `@types/express`,
+`dotenv`, `esbuild`, `tsx`, `autoprefixer`, `vite`, `@vitejs/plugin-react`.
+Volvieron `lucide-react` y `motion` porque los diseños nuevos sí las importan.
+Se eliminaron en la adopción `CurrencyProvider` (moneda única) y los
+componentes del exportador HTML (`TemplateViewer`, página `/descargar`).
 
-## Comparativa de diseños candidatos: `/disenos`
+## Pendientes
 
-Los diseños nuevos (`Servicios`, `Planes`, `Agendar`) están enlazados desde el
-desplegable **Diseños** del header y se pueden ver funcionando en rutas propias:
-
-| URL | Componente |
-| --- | ---------- |
-| `/disenos` | índice comparativo con el contenido de cada diseño |
-| `/disenos/servicios` | `Servicios.tsx` (catálogo + checkers de síntomas) |
-| `/disenos/planes` | `Planes.tsx` (3 planes + simulador de precio) |
-| `/disenos/agendar` | `Agendar.tsx` (wizard de 4 pasos) |
-| `/disenos/agendar?servicio=deporte&plan=15` | el wizard con servicio y descuento ya elegidos |
-
-Notas de implementación de esta zona de pruebas:
-
-- `Servicios2.tsx`, `Planes2.tsx` y `Agendar2.tsx` se **eliminaron**: eran
-  idénticos byte a byte a su original (mismo tamaño, mismo md5), así que no había
-  nada que elegir. Sus rutas `/disenos/*2` devuelven ahora 404.
-- El desplegable es `src/components/DesignsDropdown.tsx` y se genera desde
-  `CANDIDATES` (`src/lib/design-lab.ts`): si entra o sale un candidato, el menú y
-  la ficha de `/disenos` se actualizan solos. Se cierra al navegar, al pulsar
-  `Escape` y al hacer clic fuera, con `aria-expanded` / `aria-controls`.
-- Los 3 ficheros candidatos **no se han tocado**: ninguno lleva `"use client"`.
-  `src/components/DesignLabShell.tsx` sí lo lleva, y al importarlos desde ahí
-  quedan dentro del grafo de cliente: pueden usar `useState` y `motion` sin
-  editarlos.
-- `Agendar.tsx` genera el calendario con `new Date()` en el render, así que el shell
-  lo monta solo después del hydration para evitar el desajuste SSR/cliente.
-- `src/types.ts` es un shim mínimo que define `Tab`, el tipo que los candidatos
-  importan de `'../types'`. Si se adopta un diseño, cambia ese import a
-  `@/lib/types` y borra el shim.
-- `globals.css` define ahora `accent`, `accent-warm`, `accent-light`,
-  `primary-container` y `secondary-container` con valores **provisionales**
-  (los usaban ~90 clases de los candidatos y no existían en el tema).
-- `lucide-react` y `motion` volvieron al `package.json`: en la SPA original no se
-  usaban, estos diseños sí los importan.
-- La zona es no-indexable (`robots: { index: false }`) y no sustituye nada del
-  sitio real: `/servicios` y `/agendar` siguen con las vistas migradas.
-
-## Pendientes a decidir por ti
-
+- Confirmar las 4 tarifas en RD$ de `src/lib/prices.ts`.
 - `metadataBase` en `src/app/layout.tsx` usa `https://fisioteruel.com` como
   marcador: cámbialo por el dominio real al desplegar.
-- Teléfonos, email y direcciones (`+34 978 000 000`, `contacto@fisioteruel.com`,
-  `Av. de Sagunto`) siguen siendo los de maqueta del proyecto original.
-- Las citas publicadas por `/agendar` se guardan solo en `localStorage`: para
-  recibirlas de verdad haría falta una Route Handler (`app/api/reservas/route.ts`)
-  y una base de datos.
-- No se añadió ESLint: Next 16 usa config plano (`eslint.config.mjs`) y el proyecto
-  original solo ejecutaba `tsc --noEmit`. Si lo quieres: `pnpm add -D eslint
-  eslint-config-next`.
+- Teléfonos, emails y direcciones (`+34 978 000 000`, `contacto@fisioteruel.com`,
+  `Av. de Sagunto`) siguen siendo los de maqueta.
+- **El asistente no guarda nada**: simula el envío con un `setTimeout` de 1,8 s y
+  enseña un ID aleatorio. Para recoger citas de verdad hace falta una Route
+  Handler y una base de datos; mientras, `/reservas` conserva el guardado local.
+- **Los dos catálogos no conversan**: el asistente solo entiende `trauma`,
+  `deporte`, `geriatrica` y `neuro`. Los 6 servicios + 2 combos antiguos no
+  tienen equivalente, así que sus botones "Reservar" abren `/agendar` sin
+  preseleccionar. Si me dices cuál equivale a cuál, se conecta.
+- Precios del bloque antiguo (masajes, combos, extras) siguen en RD$ grandes
+  (5.500, 4.000…) y conviven con los nuevos (3.450–4.400) en la misma página:
+  hay que unificar la escala cuando confirmes tarifas.
+- No se añadió ESLint: Next 16 usa config plano (`eslint.config.mjs`) y el
+  proyecto original solo ejecutaba `tsc --noEmit`. Si lo quieres:
+  `pnpm add -D eslint eslint-config-next`.

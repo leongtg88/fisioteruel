@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useCurrency } from "@/components/CurrencyProvider";
 import { COMBOS_DATA, SERVICES_DATA } from "@/lib/data";
 import { formatPrice } from "@/lib/format";
 import type { AdvancedBooking } from "@/lib/types";
@@ -82,7 +81,6 @@ function getTimeLabel(timeVal: string) {
 }
 
 export default function BookingView({ initialServiceId }: BookingViewProps) {
-  const { currency } = useCurrency();
 
   // Local state for form submission variables
   const [selectedServiceId, setSelectedServiceId] = useState(
@@ -271,7 +269,7 @@ export default function BookingView({ initialServiceId }: BookingViewProps) {
               >
                 {ALL_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.name} — {formatPrice(opt.price, currency)}
+                    {opt.name} — {formatPrice(opt.price)}
                   </option>
                 ))}
               </select>
@@ -530,7 +528,7 @@ export default function BookingView({ initialServiceId }: BookingViewProps) {
                     <div className="bg-white/60 p-2 rounded text-[11px] text-slate-800 border border-white/50 font-bold flex justify-between items-center">
                       <span>Precio estimado:</span>
                       <strong className="text-primary font-extrabold">
-                        {formatPrice(bk.totalPrice, currency)}
+                        {formatPrice(bk.totalPrice)}
                       </strong>
                     </div>
                   </div>

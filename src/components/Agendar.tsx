@@ -2,6 +2,8 @@ import { useState, FormEvent } from 'react';
 import { Calendar as CalendarIcon, User, Clock, MapPin, ChevronRight, CheckCircle2, ShieldCheck, Mail, Phone, Info, Sparkles, Loader2, FileText, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Tab } from '../types';
+import { formatPrice } from '@/lib/format';
+import { THERAPY_PRICE_DOP } from '@/lib/prices';
 
 interface AgendarProps {
   selectedServiceId: string;
@@ -38,10 +40,10 @@ export default function Agendar({
 
   // Diagnostic data
   const services = [
-    { id: 'trauma', name: 'Fisioterapia Traumatológica', price: 60, icon: '🦴' },
-    { id: 'deporte', name: 'Fisioterapia Deportiva', price: 65, icon: '🏋️' },
-    { id: 'geriatrica', name: 'Fisioterapia Geriátrica', price: 55, icon: '👴' },
-    { id: 'neuro', name: 'Fisioterapia Neurológica', price: 70, icon: '🧠' }
+    { id: 'trauma', name: 'Fisioterapia Traumatológica', price: THERAPY_PRICE_DOP.trauma, icon: '🦴' },
+    { id: 'deporte', name: 'Fisioterapia Deportiva', price: THERAPY_PRICE_DOP.deporte, icon: '🏋️' },
+    { id: 'geriatrica', name: 'Fisioterapia Geriátrica', price: THERAPY_PRICE_DOP.geriatrica, icon: '👴' },
+    { id: 'neuro', name: 'Fisioterapia Neurológica', price: THERAPY_PRICE_DOP.neuro, icon: '🧠' }
   ];
 
   const specialists = [
@@ -193,7 +195,7 @@ export default function Agendar({
                         <span className="text-2xl bg-white p-2 rounded-lg shadow-sm border border-border-subtle/40 leading-none inline-block">{svc.icon}</span>
                         <div className="flex-1">
                           <span className="font-serif text-sm font-bold text-text-dark block">{svc.name}</span>
-                          <span className="font-sans text-xs font-semibold text-primary block mt-0.5">{svc.price}€ / sesión</span>
+                          <span className="font-sans text-xs font-semibold text-primary block mt-0.5">{formatPrice(svc.price)} / sesión</span>
                           <span className="font-sans text-[10px] text-text-muted block leading-snug mt-1">Con camilla profesional y material incluido.</span>
                         </div>
                       </button>
@@ -554,28 +556,28 @@ export default function Agendar({
             <div className="border-t border-border-subtle pt-4 space-y-2 text-xs sm:text-sm text-text-muted">
               <div className="flex justify-between">
                 <span>Consulta Clínica a domicilio:</span>
-                <span className="font-semibold text-text-dark">{basePrice}€</span>
+                <span className="font-semibold text-text-dark">{formatPrice(basePrice)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Desplazamiento a Teruel comarca:</span>
-                <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Incluido (0€)</span>
+                <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Incluido (RD$ 0)</span>
               </div>
               <div className="flex justify-between font-sans">
                 <span>Equipo higienizado desechable:</span>
-                <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Incluido (0€)</span>
+                <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Incluido (RD$ 0)</span>
               </div>
 
               {selectedPlanDiscount > 0 && (
                 <div className="flex justify-between text-accent font-sans font-bold bg-accent-light/40 p-2 rounded-lg border border-accent/20">
                   <span>Descuento de Plan ({selectedPlanDiscount}%):</span>
-                  <span>-{discountVal.toFixed(2)}€</span>
+                  <span>-{formatPrice(discountVal)}</span>
                 </div>
               )}
 
               <div className="flex justify-between items-baseline pt-3 border-t border-border-subtle mt-4">
                 <span className="font-sans text-sm font-bold text-text-dark">Total Sesión:</span>
                 <span className="font-serif text-2xl font-extrabold text-primary">
-                  {finalPrice.toFixed(0)}€
+                  {formatPrice(finalPrice)}
                 </span>
               </div>
             </div>
