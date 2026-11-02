@@ -1,43 +1,47 @@
 import Link from "next/link";
 import { NAV_ITEMS, ROUTES } from "@/lib/nav";
+import { CONTACT_DATA, SCHEDULE_DATA } from "@/lib/data";
 
 export default function Footer() {
   return (
-    <footer className="bg-white/40 backdrop-blur-md border-t border-white/25 py-12 px-6 relative z-10">
-      <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-slate-800">
+    <footer className="bg-lead text-slate-300 border-t border-primary/20 py-12 px-6 relative z-10">
+      <div className="max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-3 gap-10">
         {/* Brand/About Col */}
         <div className="flex flex-col gap-3 max-w-sm">
-          <span className="font-serif text-2xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-              <span className="material-symbols-outlined text-lg text-primary font-light">
+          <div className="font-serif text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span className="w-8 h-8 bg-primary/25 rounded-lg flex items-center justify-center">
+              <span
+                className="material-symbols-outlined text-lg text-sky-200"
+                aria-hidden="true"
+              >
                 physical_therapy
               </span>
-            </div>
-            <span className="font-sans font-extrabold uppercase text-base tracking-tight text-slate-900">
-              Fisio<span className="text-primary font-bold">teruel</span>
             </span>
-          </span>
-          <p className="text-sm text-slate-700 leading-relaxed font-semibold">
-            Llevamos la excelencia de la terapia física y rehabilitación
-            directamente a tu domicilio, promoviendo salud, autonomía y
-            bienestar integral en Teruel Capital y localidades cercanas.
+            <span className="font-sans font-extrabold uppercase text-base tracking-tight text-white">
+              Fisio<span className="text-accent">teruel</span>
+            </span>
+          </div>
+          <p className="text-sm text-slate-300 leading-relaxed font-semibold">
+            Llevamos la fisioterapia, los masajes terapéuticos y el bienestar
+            directamente a tu domicilio en Santo Domingo, promoviendo salud,
+            autonomía y equilibrio.
           </p>
-          <p className="text-xs text-slate-500 font-extrabold mt-2">
-            © 2026 Fisioteruel &amp; Wellness. Teruel, España.
+          <p className="text-xs text-slate-400 font-bold mt-2">
+            © 2026 Fisioteruel &amp; Wellness. Santo Domingo, RD.
           </p>
         </div>
 
         {/* Links Col */}
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-black text-primary tracking-wider uppercase">
-            Enlaces Rápidos
+          <span className="text-sm font-black text-accent tracking-wider uppercase">
+            Enlaces rápidos
           </span>
           <div className="flex flex-col gap-2">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.key}
                 href={ROUTES[item.key]}
-                className="text-left text-sm text-slate-600 font-semibold hover:text-primary transition-colors"
+                className="text-left text-sm text-slate-300 font-semibold hover:text-accent transition-colors"
                 id={`footer_link_${item.key}`}
               >
                 {item.drawerLabel}
@@ -48,40 +52,66 @@ export default function Footer() {
 
         {/* Contact Col */}
         <div className="flex flex-col gap-3">
-          <span className="text-sm font-black text-primary tracking-wider uppercase">
+          <span className="text-sm font-black text-accent tracking-wider uppercase">
             Contacto
           </span>
-          <p className="text-sm text-slate-700 font-semibold flex items-center gap-2">
-            <span className="material-symbols-outlined text-slate-500 text-lg">
+          <p className="text-sm text-slate-300 font-semibold flex items-center gap-2">
+            <span
+              className="material-symbols-outlined text-slate-400 text-lg"
+              aria-hidden="true"
+            >
               pin_drop
             </span>
-            <span>Av. de Sagunto, Teruel, España</span>
+            <span>{CONTACT_DATA.address}</span>
           </p>
-          <p className="text-sm text-slate-700 font-semibold flex items-center gap-2">
-            <span className="material-symbols-outlined text-slate-500 text-lg">
+          <p className="text-sm text-slate-300 font-semibold flex items-center gap-2">
+            <span
+              className="material-symbols-outlined text-slate-400 text-lg"
+              aria-hidden="true"
+            >
               call
             </span>
-            <span>+34 978 000 000</span>
+            <a
+              href={CONTACT_DATA.phoneHref}
+              className="hover:text-accent transition-colors"
+            >
+              {CONTACT_DATA.phone}
+            </a>
           </p>
+          <div className="flex flex-col gap-1 mt-2 text-xs text-slate-400 font-semibold">
+            {SCHEDULE_DATA.map((block) => (
+              <p key={block.days}>
+                <span className="text-slate-300">{block.daysShort}:</span>{" "}
+                {block.hours}
+                {block.note ? ` (${block.note.toLowerCase()})` : ""}
+              </p>
+            ))}
+          </div>
 
           <div className="flex gap-3 mt-2">
             <a
-              className="text-slate-600 hover:text-primary transition-colors bg-white/60 backdrop-blur-xs p-2.5 rounded-full shadow-xs border border-white/40 flex items-center justify-center"
-              href="mailto:contacto@fisioteruel.com"
-              title="Escríbenos por correo"
+              className="text-slate-200 hover:text-white transition-colors bg-white/10 p-2.5 rounded-full border border-white/15 flex items-center justify-center hover:bg-primary"
+              href={`mailto:${CONTACT_DATA.email}`}
+              aria-label="Escríbenos por correo electrónico"
               id="footer_email_action"
             >
-              <span className="material-symbols-outlined text-lg">
+              <span
+                className="material-symbols-outlined text-lg"
+                aria-hidden="true"
+              >
                 alternate_email
               </span>
             </a>
             <a
-              className="text-slate-600 hover:text-primary transition-colors bg-white/60 backdrop-blur-xs p-2.5 rounded-full shadow-xs border border-white/40 flex items-center justify-center"
-              href="tel:+34978000000"
-              title="Llámanos por teléfono"
+              className="text-slate-200 hover:text-white transition-colors bg-white/10 p-2.5 rounded-full border border-white/15 flex items-center justify-center hover:bg-primary"
+              href={CONTACT_DATA.phoneHref}
+              aria-label="Llámanos por teléfono"
               id="footer_phone_action"
             >
-              <span className="material-symbols-outlined text-lg">
+              <span
+                className="material-symbols-outlined text-lg"
+                aria-hidden="true"
+              >
                 phone_iphone
               </span>
             </a>

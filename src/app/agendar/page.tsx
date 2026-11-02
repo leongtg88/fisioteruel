@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import CandidateShell from "@/components/CandidateShell";
-import { THERAPY_PRICE_DOP } from "@/lib/prices";
+import { BOOKABLE_SERVICES } from "@/lib/data";
 
 export const metadata: Metadata = {
   title: "Agendar cita a domicilio",
   description:
-    "Reserva tu sesión de fisioterapia a domicilio en Teruel en 4 pasos: especialidad, fisioterapeuta, fecha y hora, y datos del paciente.",
+    "Reserva tu sesión de fisioterapia, masaje o combo a domicilio en Santo Domingo en 4 pasos: servicio, profesional, fecha y hora, y datos del paciente.",
   alternates: { canonical: "/agendar" },
 };
 
-const THERAPY_IDS = new Set<string>(Object.keys(THERAPY_PRICE_DOP));
+const BOOKABLE_IDS = new Set<string>(BOOKABLE_SERVICES.map((service) => service.id));
 
 /** Descuento del plan en %: se limita a un rango razonable. */
 function parseDiscount(value: string | undefined): number | undefined {
@@ -27,12 +27,17 @@ export default async function AgendarPage({
   const { servicio, plan } = await searchParams;
 
   return (
-    <CandidateShell
-      kind="agendar"
-      initialServiceId={
-        servicio && THERAPY_IDS.has(servicio) ? servicio : undefined
-      }
-      initialPlanDiscount={parseDiscount(plan)}
-    />
+    <>
+      <h1 className="sr-only">
+        Agendar cita de fisioterapia o masaje a domicilio en Santo Domingo
+      </h1>
+      <CandidateShell
+        kind="agendar"
+        initialServiceId={
+          servicio && BOOKABLE_IDS.has(servicio) ? servicio : undefined
+        }
+        initialPlanDiscount={parseDiscount(plan)}
+      />
+    </>
   );
 }

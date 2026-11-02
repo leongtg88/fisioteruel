@@ -88,11 +88,15 @@ export default function CandidateShell({
 
   if (CLIENT_ONLY.includes(kind) && !mounted) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-24 text-center">
-        <p className="text-sm font-bold text-slate-500">
+      <div
+        className="max-w-7xl mx-auto px-6 py-24 text-center"
+        role="status"
+        aria-live="polite"
+      >
+        <p className="text-sm font-bold text-lead-muted">
           Cargando el asistente de reserva en el navegador…
         </p>
-        <p className="text-xs text-slate-400 mt-2">
+        <p className="text-xs text-lead-muted mt-2">
           Este diseño genera el calendario con la fecha actual en el render, así
           que se monta solo en cliente para evitar un desajuste de hidratación.
         </p>
@@ -105,7 +109,7 @@ export default function CandidateShell({
   if (kind === "agendar") {
     return (
       <Component
-        selectedServiceId={initialServiceId ?? "trauma"}
+        selectedServiceId={initialServiceId ?? "sesion-fisio"}
         selectedPlanDiscount={initialPlanDiscount ?? 0}
         onChangeTab={onChangeTab}
         onResetSelection={onResetSelection}

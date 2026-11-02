@@ -1,44 +1,122 @@
 @import "tailwindcss";
 
+/*
+ * Paleta de marca: azul cian, blanco y gris plomo con toques de amarillo.
+ *
+ * El amarillo se usa SIEMPRE como relleno con texto `text-lead` (≈10:1).
+ * Para texto amarillo sobre blanco existe `accent-text` (#A16207, 4,9:1).
+ * Los botones con texto blanco de 12-14 px usan `primary-strong` (#0369A1,
+ * 5,9:1); `primary` (#0284C7) queda para iconos, fondos grandes y adornos.
+ */
 @theme {
-  --color-primary: #0f766e; /* Teal-700 for legible, rich branding & typography */
-  --color-secondary: #2563eb; /* Blue-600 accent */
-  --color-tertiary: #115e59; /* Teal-800 button styling */
-  --color-accent-amber: #d97706; /* Amber-650 */
-  --color-surface-container: rgba(255, 255, 255, 0.45);
-  --color-surface-container-low: rgba(255, 255, 255, 0.25);
-  --color-surface-container-lowest: rgba(255, 255, 255, 0.7);
-  --color-cream-bg: #eef2f6; /* Modern grey-blue canvas background */
-  --color-on-surface-variant: #424653;
+  /* Azul */
+  --color-primary: #0284c7;
+  --color-primary-strong: #0369a1;
+  --color-primary-deep: #075985;
+  --color-primary-soft: #e0f2fe;
+  --color-primary-container: #0369a1;
+  --color-secondary: #0ea5e9;
+  --color-secondary-container: #e0f2fe;
+  --color-tertiary: #075985;
 
-  /* PROVISIONAL: tokens que usan los diseños candidatos de src/app/disenos
-     (Servicios / Planes / Agendar). No venían definidos en el tema original,
-     así que sus ~90 clases de color se quedaban sin estilo. Sustituir estos
-     valores por la paleta real si se conserva el tailwind.config de origen. */
-  --color-primary-container: #115e59; /* teal-800: hover sobre bg-primary */
-  --color-secondary-container: #dbeafe; /* azul suave para chips/badges */
-  --color-accent: #d97706; /* ámbar: descuentos y precios destacados */
-  --color-accent-warm: #c2410c; /* naranja quemado: llamadas de atención */
-  --color-accent-light: #fde68a; /* ámbar claro: halos/brillos decorativos */
-  --color-text-dark: #16212b; /* usado 60 veces por los candidatos */
-  --color-text-muted: #41484f; /* usado 58 veces por los candidatos */
+  /* Amarillo */
+  --color-accent: #facc15;
+  --color-accent-strong: #eab308;
+  --color-accent-warm: #facc15;
+  --color-accent-light: #fef08a;
+  --color-accent-soft: #fef9c3;
+  --color-accent-text: #a16207;
+  --color-accent-amber: #eab308;
+
+  /* Neutros: blanco y gris plomo */
+  --color-lead: #1e293b;
+  --color-lead-muted: #475569;
+  --color-bg-base: #f8fafc;
+  --color-border-subtle: #e2e8f0;
+  --color-cream-bg: #f1f5f9;
+  --color-text-dark: #0f172a;
+  --color-text-muted: #475569;
+  --color-on-surface-variant: #475569;
+  --color-surface-container: rgba(255, 255, 255, 0.55);
+  --color-surface-container-low: rgba(255, 255, 255, 0.35);
+  --color-surface-container-lowest: rgba(255, 255, 255, 0.8);
 }
 
-/* Source Serif 4 y Work Sans se cargan con next/font (app/layout.tsx) y se
-   exponen como variables CSS. Material Symbols se sirve por <link> porque
-   necesita ejes variables (FILL/GRAD) que next/font no soporta. */
+/* Nunito se autohospeda con next/font (app/layout.tsx) y se expone como
+   variable CSS. Se mapea también a `font-serif` para que los titulares de los
+   diseños heredados sigan resolviendo sin tocar sus clases. */
 @theme inline {
-  --font-serif: var(--font-source-serif), Georgia, serif;
-  --font-sans: var(--font-work-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
-  /* El SPA original hacía scroll suave manual al cambiar de pantalla. Con
-     rutas reales se conserva para los anclajes internos (#masajes, #combos).
-     El atributo data-scroll-behavior de <html> hace que Next 16 lo suspenda
-     durante las navigaciones para que el cambio de página sea instantáneo. */
   html {
+    color-scheme: light;
     scroll-behavior: smooth;
+  }
+
+  body {
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a,
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Reemplazo de foco global: visible en teclado, silencioso con ratón. */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-accent-light);
+    color: var(--color-text-dark);
+  }
+
+  /* Las anclas (#masajes, #combos…) no quedan bajo el header sticky. */
+  :target {
+    scroll-margin-top: 6rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Receta única de tarjeta del home: vidrio claro, borde sutil, radio grande y
+     sombra suave. Vive en `components` para que las utilidades de Tailwind
+     (por ejemplo `hover:bg-white`) puedan sobrescribirla. */
+  .glass-card {
+    border-radius: 2rem;
+    border: 1px solid var(--color-border-subtle);
+    background-color: rgb(255 255 255 / 0.8);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow:
+      0 1px 3px 0 rgb(0 0 0 / 0.1),
+      0 1px 2px -1px rgb(0 0 0 / 0.1);
   }
 }
 
@@ -48,18 +126,25 @@
     font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
     display: inline-block;
     vertical-align: middle;
+    line-height: 1;
   }
-  .glass-card {
-    background: rgba(255, 255, 255, 0.4);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 8px 32px 0 rgba(15, 118, 110, 0.04);
+
+  .soft-shadow {
+    box-shadow:
+      0 10px 30px -12px rgba(2, 132, 199, 0.18),
+      0 2px 6px -2px rgba(15, 23, 42, 0.06);
   }
+
   .glass-card-dense {
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 12px 40px 0 rgba(15, 118, 110, 0.06);
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 12px 40px 0 rgba(2, 132, 199, 0.08);
+  }
+
+  /* Cifras alineadas en precios, tablas y simuladores. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -74,7 +159,12 @@
   }
 }
 
-/* Antes se usaba `animate-fade-in` sin estar definido: ahora existe. */
 .animate-fade-in {
   animation: fisioteruel-fade-in 0.45s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in {
+    animation: none;
+  }
 }

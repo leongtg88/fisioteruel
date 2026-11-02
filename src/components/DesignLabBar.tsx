@@ -9,10 +9,13 @@ export default function DesignLabBar() {
   const pathname = usePathname();
 
   return (
-    <div className="border-b border-dashed border-amber-400/60 bg-amber-100/70 backdrop-blur-md">
+    <div className="border-b border-dashed border-accent/60 bg-accent-soft/80 backdrop-blur-md">
       <div className="max-w-[1280px] mx-auto px-6 py-3 flex flex-wrap items-center gap-x-6 gap-y-3">
-        <span className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-amber-900">
-          <span className="material-symbols-outlined text-base">
+        <span className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-accent-text">
+          <span
+            className="material-symbols-outlined text-base"
+            aria-hidden="true"
+          >
             design_services
           </span>
           <span>Laboratorio de diseños</span>
@@ -29,8 +32,8 @@ export default function DesignLabBar() {
                 aria-current={isActive ? "page" : undefined}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
                   isActive
-                    ? "bg-amber-900 text-amber-50"
-                    : "text-amber-900/80 hover:bg-amber-200/70"
+                    ? "bg-lead text-accent-soft"
+                    : "text-accent-text hover:bg-accent/40"
                 }`}
               >
                 {candidate.title}
@@ -42,13 +45,13 @@ export default function DesignLabBar() {
         <div className="ml-auto flex items-center gap-4">
           <Link
             href="/disenos"
-            className="text-xs font-bold text-amber-900 hover:underline"
+            className="text-xs font-bold text-accent-text hover:underline"
           >
             Ver comparativa
           </Link>
           <Link
             href="/"
-            className="text-xs font-bold text-slate-600 hover:text-primary"
+            className="text-xs font-bold text-lead-muted hover:text-primary-deep"
           >
             Salir al sitio real
           </Link>

@@ -4,7 +4,7 @@ import BookingView from "@/components/BookingView";
 export const metadata: Metadata = {
   title: "Solicitudes guardadas",
   description:
-    "Formulario de reserva clásico y listado de citas guardadas en este navegador.",
+    "Formulario de reserva clásico y listado de citas guardadas en este navegador para Santo Domingo.",
   alternates: { canonical: "/reservas" },
   robots: { index: false },
 };

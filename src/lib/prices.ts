@@ -1,19 +1,17 @@
 /**
- * Precio por sesión de cada especialidad, en pesos dominicanos.
+ * Tarifas base de fisioterapia, en pesos dominicanos (RD$).
  *
- * Los diseños candidatos traían estos importes en euros (60 / 65 / 55 / 70 €) y
- * repetidos en tres ficheros. Se pasan a RD$ con el tipo de cambio de
- * referencia del proyecto (1 € ≈ 62,5 RD$) y quedan aquí como única fuente de
- * verdad: `Servicios.tsx`, `Planes.tsx` y `Agendar.tsx` leen de este mapa.
- *
- * Los importes son un cálculo a partir de los euros del diseño, no una tarifa
- * confirmada por el cliente. Si cambian, se tocan aquí y en nada más.
+ * El catálogo completo vive en `src/lib/data.ts`. Este mapa se conserva para
+ * los componentes que solo necesitan las dos tarifas de fisioterapia.
  */
 export const THERAPY_PRICE_DOP = {
-  trauma: 3750, // 60 €
-  deporte: 4050, // 65 €
-  geriatrica: 3450, // 55 €
-  neuro: 4400, // 70 €
+  "eval-fisio": 5500,
+  "sesion-fisio": 4000,
 } as const;
 
 export type TherapyId = keyof typeof THERAPY_PRICE_DOP;
+
+/** Los planes de descuento aplican únicamente a servicios de fisioterapia. */
+export const PLAN_DISCOUNT_SERVICE_IDS = new Set<string>(
+  Object.keys(THERAPY_PRICE_DOP)
+);
