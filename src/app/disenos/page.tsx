@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { CANDIDATES, labPath } from "@/lib/design-lab";
 
-const UNIQUE = CANDIDATES.filter((candidate) => candidate.line === 1);
-const DUPLICATES = CANDIDATES.filter((candidate) => candidate.line === 2);
-
 export default function DisenosIndexPage() {
   return (
     <div className="animate-fade-in max-w-[1280px] mx-auto px-6 py-12 flex flex-col gap-10">
@@ -12,12 +9,14 @@ export default function DisenosIndexPage() {
           Comparativa de candidatos
         </span>
         <h1 className="font-serif text-4xl sm:text-5xl font-bold text-slate-900 mt-4 leading-tight">
-          Tres diseños nuevos, seis ficheros
+          Los tres diseños candidatos
         </h1>
         <p className="text-sm sm:text-base text-slate-700 font-semibold leading-relaxed mt-4">
           Cada tarjeta enlaza a una ruta real donde el componente se ejecuta con
           sus props cableadas a la navegación, así que puedes usar el wizard tal
-          como está pensado. La versión actual del sitio sigue intacta en{" "}
+          como está pensado. También están disponibles desde el desplegable{" "}
+          <strong>Diseños</strong> del header. La versión actual del sitio sigue
+          intacta en{" "}
           <Link href="/servicios" className="text-primary font-bold hover:underline">
             /servicios
           </Link>{" "}
@@ -32,34 +31,22 @@ export default function DisenosIndexPage() {
       <section className="bg-emerald-50/70 backdrop-blur-md border border-emerald-300 p-6 rounded-2xl">
         <h2 className="font-bold text-emerald-900 flex items-center gap-2">
           <span className="material-symbols-outlined text-emerald-700">
-            fmd_bad
+            delete_sweep
           </span>
-          <span>Lo primero: las variantes «2» no aportan nada</span>
+          <span>Réplicas «2» eliminadas</span>
         </h2>
         <p className="text-sm text-emerald-950 font-semibold leading-relaxed mt-2">
           <code className="font-mono">Servicios2.tsx</code>,{" "}
           <code className="font-mono">Planes2.tsx</code> y{" "}
-          <code className="font-mono">Agendar2.tsx</code> son idénticos byte a
-          byte a su gemelo (mismo tamaño y mismo checksum md5). No hay nada que
-          elegir entre ellos: o borras las copias, o nos faltan ficheros por
-          subir.
+          <code className="font-mono">Agendar2.tsx</code> eran idénticos byte a
+          byte a su gemelo (mismo tamaño, mismo checksum md5), así que se han
+          borrado junto con sus rutas{" "}
+          <code className="font-mono">/disenos/*2</code>. Quedan los 3 originales.
         </p>
-        <ul className="text-xs font-mono text-emerald-900 mt-3 space-y-1">
-          {UNIQUE.map((candidate) => {
-            const twin = DUPLICATES.find(
-              (item) => item.kind === candidate.kind
-            );
-            return (
-              <li key={candidate.key}>
-                {candidate.file} ≡ {twin?.file}
-              </li>
-            );
-          })}
-        </ul>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {UNIQUE.map((candidate) => (
+        {CANDIDATES.map((candidate) => (
           <article
             key={candidate.key}
             className="bg-white/45 backdrop-blur-md border border-white/55 rounded-[2rem] p-8 shadow-md flex flex-col gap-5"
@@ -100,7 +87,7 @@ export default function DisenosIndexPage() {
 
             <div className="mt-auto flex flex-col gap-2 pt-4">
               <Link
-                href={labPath(candidate.kind, 1)}
+                href={labPath(candidate.kind)}
                 className="bg-primary text-white text-center px-6 py-3 rounded-xl text-sm font-bold shadow-md shadow-primary/25 hover:bg-primary/90 transition-colors"
               >
                 Ver {candidate.title}

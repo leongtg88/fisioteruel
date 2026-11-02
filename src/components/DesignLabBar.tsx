@@ -34,11 +34,6 @@ export default function DesignLabBar() {
                 }`}
               >
                 {candidate.title}
-                {candidate.line === 2 && (
-                  <span className="ml-1 text-[10px] font-normal opacity-70">
-                    (= {candidate.title.replace(" 2", "")})
-                  </span>
-                )}
               </Link>
             );
           })}

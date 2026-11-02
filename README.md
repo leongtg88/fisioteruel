@@ -32,6 +32,7 @@ en rutas reales del App Router:
 | `/servicios` | Catálogo de servicios, combos y extras             |
 | `/agendar`   | Formulario de reserva y listado de citas locales   |
 | `/descargar` | Visor de las plantillas HTML standalone            |
+| `/disenos/*` | Comparativa de los 3 diseños candidatos (noindex) |
 
 Detalles del mapeo:
 
@@ -97,8 +98,8 @@ Alias `@/*` → `src/*` (definido en `tsconfig.json`).
 
 ## Comparativa de diseños candidatos: `/disenos`
 
-En `src/components/` hay diseños nuevos (`Servicios`, `Planes`, `Agendar` y sus
-copias con sufijo `2`). Se pueden ver funcionando en rutas propias:
+Los diseños nuevos (`Servicios`, `Planes`, `Agendar`) están enlazados desde el
+desplegable **Diseños** del header y se pueden ver funcionando en rutas propias:
 
 | URL | Componente |
 | --- | ---------- |
@@ -107,16 +108,20 @@ copias con sufijo `2`). Se pueden ver funcionando en rutas propias:
 | `/disenos/planes` | `Planes.tsx` (3 planes + simulador de precio) |
 | `/disenos/agendar` | `Agendar.tsx` (wizard de 4 pasos) |
 | `/disenos/agendar?servicio=deporte&plan=15` | el wizard con servicio y descuento ya elegidos |
-| `/disenos/servicios2`, `/disenos/planes2`, `/disenos/agendar2` | réplicas idénticas |
 
 Notas de implementación de esta zona de pruebas:
 
-- Los 6 ficheros **no se han tocado**: `Servicios2.tsx`, `Planes2.tsx` y
-  `Agendar2.tsx` son idénticos byte a byte a sus gemelos (verificado con `diff -q`
-  y `md5sum`), así que no hay decisión que tomar entre ellos.
-- Ninguno lleva `"use client"`. `src/components/DesignLabShell.tsx` sí lo lleva, y
-  al importarlos desde ahí quedan dentro del grafo de cliente: pueden usar `useState`
-  y `motion` sin editarlos.
+- `Servicios2.tsx`, `Planes2.tsx` y `Agendar2.tsx` se **eliminaron**: eran
+  idénticos byte a byte a su original (mismo tamaño, mismo md5), así que no había
+  nada que elegir. Sus rutas `/disenos/*2` devuelven ahora 404.
+- El desplegable es `src/components/DesignsDropdown.tsx` y se genera desde
+  `CANDIDATES` (`src/lib/design-lab.ts`): si entra o sale un candidato, el menú y
+  la ficha de `/disenos` se actualizan solos. Se cierra al navegar, al pulsar
+  `Escape` y al hacer clic fuera, con `aria-expanded` / `aria-controls`.
+- Los 3 ficheros candidatos **no se han tocado**: ninguno lleva `"use client"`.
+  `src/components/DesignLabShell.tsx` sí lo lleva, y al importarlos desde ahí
+  quedan dentro del grafo de cliente: pueden usar `useState` y `motion` sin
+  editarlos.
 - `Agendar.tsx` genera el calendario con `new Date()` en el render, así que el shell
   lo monta solo después del hydration para evitar el desajuste SSR/cliente.
 - `src/types.ts` es un shim mínimo que define `Tab`, el tipo que los candidatos

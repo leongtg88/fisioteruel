@@ -3,26 +3,20 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type JSX } from "react";
 import Agendar from "@/components/Agendar";
-import Agendar2 from "@/components/Agendar2";
 import Planes from "@/components/Planes";
-import Planes2 from "@/components/Planes2";
 import Servicios from "@/components/Servicios";
-import Servicios2 from "@/components/Servicios2";
 import type { Tab } from "@/types";
 import { labPath, type CandidateMeta } from "@/lib/design-lab";
 
 /**
- * Registro en el cliente. Estos 6 ficheros NO llevan "use client": al
+ * Registro en el cliente. Estos 3 ficheros NO llevan "use client": al
  * importarlos desde aquí entran en el grafo de cliente y pueden usar sus hooks
  * sin que hayamos tenido que editarlos.
  */
 const REGISTRY: Record<string, JSX.ElementType> = {
   servicios: Servicios,
-  servicios2: Servicios2,
   planes: Planes,
-  planes2: Planes2,
   agendar: Agendar,
-  agendar2: Agendar2,
 };
 
 interface DesignLabShellProps {
@@ -37,7 +31,6 @@ export default function DesignLabShell({
   initialPlanDiscount,
 }: DesignLabShellProps) {
   const router = useRouter();
-  const { line } = candidate;
 
   // Agendar construye el calendario con new Date() durante el render: si se
   // renderiza en el servidor, el HTML ya no coincide con el del cliente.
@@ -47,25 +40,21 @@ export default function DesignLabShell({
   }, []);
 
   const onChangeTab = (tab: Tab) => {
-    if (tab === "inicio") {
-      router.push("/disenos");
+    if (tab === "inicio" || tab === "descargar") {
+      router.push(tab === "inicio" ? "/disenos" : "/");
       return;
     }
-    if (tab === "descargar") {
-      router.push("/");
-      return;
-    }
-    router.push(labPath(tab, line));
+    router.push(labPath(tab));
   };
 
   const onSelectServiceAndPlan = (serviceId: string, planDiscount: number) => {
     router.push(
-      `${labPath("agendar", line)}?servicio=${encodeURIComponent(serviceId)}&plan=${planDiscount}`
+      `${labPath("agendar")}?servicio=${encodeURIComponent(serviceId)}&plan=${planDiscount}`
     );
   };
 
   const onResetSelection = () => {
-    router.push(labPath(candidate.kind, line));
+    router.push(labPath(candidate.kind));
   };
 
   if (candidate.clientOnly && !mounted) {

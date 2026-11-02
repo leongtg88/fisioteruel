@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCurrency } from "@/components/CurrencyProvider";
+import DesignsDropdown from "@/components/DesignsDropdown";
 import { NAV_ITEMS, ROUTES, routeKeyFromPathname } from "@/lib/nav";
 
 export default function Header() {
@@ -60,7 +61,7 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-6">
             {NAV_ITEMS.map((item) => {
               const isActive = currentRoute === item.key;
               const inactiveClasses = item.highlight
@@ -88,6 +89,13 @@ export default function Header() {
                 </Link>
               );
             })}
+
+            {/* Candidatos de rediseño (Comparativa /disenos). A partir de lg:
+                por debajo de ese ancho no cabe todo el menú y se accede desde
+                el drawer móvil. */}
+            <div className="hidden lg:block">
+              <DesignsDropdown variant="desktop" />
+            </div>
           </div>
 
           {/* Right actions: Currency selector & Agenda Button */}
@@ -189,6 +197,8 @@ export default function Header() {
                 </Link>
               );
             })}
+
+            <DesignsDropdown variant="drawer" />
           </div>
 
           {/* Drawer footer info */}
