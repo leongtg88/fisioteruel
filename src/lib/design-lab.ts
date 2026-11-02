@@ -17,8 +17,6 @@ export interface CandidateMeta {
   livePath: string;
   summary: string;
   highlights: string[];
-  /** Icono Material Symbols para el desplegable del header */
-  icon: string;
   /** usa `new Date()` en el render: no es seguro renderizarlo en el servidor */
   clientOnly?: boolean;
 }
@@ -30,7 +28,6 @@ export const CANDIDATES: CandidateMeta[] = [
     file: "src/components/Servicios.tsx",
     kind: "servicios",
     livePath: "/servicios",
-    icon: "rebase_edit",
     summary:
       "Catálogo de 4 especialidades (traumatológica, deportiva, geriátrica y neurológica) con checkers de síntomas interactivos.",
     highlights: [
@@ -47,7 +44,6 @@ export const CANDIDATES: CandidateMeta[] = [
     file: "src/components/Planes.tsx",
     kind: "planes",
     livePath: "/planes",
-    icon: "card_membership",
     summary:
       "Página comercial de bonos: tres planes por volumen, simulador de precio en vivo, métodos de pago y buzón de consultas.",
     highlights: [
@@ -65,7 +61,6 @@ export const CANDIDATES: CandidateMeta[] = [
     file: "src/components/Agendar.tsx",
     kind: "agendar",
     livePath: "/agendar",
-    icon: "calendar_month",
     summary:
       "Asistente de reserva en 4 pasos con resumen lateral fijo, calendario de 7 días, especialistas y modal de confirmación.",
     highlights: [

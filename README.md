@@ -24,7 +24,8 @@ No hay variables de entorno obligatorias: las antiguas `GEMINI_API_KEY` y
 ## Rutas y navegación
 
 La navegación por pantallas (`ScreenType` + `useState` en `App.tsx`) se convirtió
-en rutas reales del App Router. El menú enlaza cuatro cosas:
+en rutas reales del App Router. El menú enlaza cuatro cosas — Inicio, Servicios
+y Tarifas, Planes y Agendar — más el botón «Reservar cita»:
 
 | Ruta              | Página                                                              |
 | ----------------- | ------------------------------------------------------------------- |
@@ -33,10 +34,11 @@ en rutas reales del App Router. El menú enlaza cuatro cosas:
 | `/planes`         | Planes y bonos, con simulador de precio                              |
 | `/agendar`        | Asistente de reserva en 4 pasos                                      |
 | `/reservas`       | Formulario antiguo (guarda citas en `localStorage`), **sin enlace**  |
-| `/disenos/*`      | Los 3 diseños sueltos para revisarlos (noindex)                      |
+| `/disenos/*`      | Los 3 diseños sueltos para revisarlos, **solo por URL** (noindex)    |
 
-Quitados del header y del drawer: **"Exportar HTML"** (la página `/descargar` ya
-no existe) y **"Agenda Online"** (el formulario viejo vive en `/reservas`).
+Quitados del menú: **«Exportar HTML»** (la página `/descargar` ya no existe),
+**«Agenda Online»** (el formulario viejo vive en `/reservas`) y el desplegable
+**«Diseños»**, que ahora se visita escribiendo la dirección.
 
 ## Cómo encajan los diseños nuevos
 
@@ -85,7 +87,7 @@ tipo de cambio que el propio proyecto declaraba (`1 € ≈ 62,5 RD$`) y los dej
 src/
   app/           layout, globals.css y una carpeta por ruta
                  (/, /servicios, /planes, /agendar, /reservas, /disenos)
-  components/    Header, Footer, CandidateShell, DesignsDropdown,
+  components/    Header, Footer, CandidateShell,
                  vistas migradas (HomeView, ServicesView, BookingView)
                  y los 3 candidatos (Servicios, Planes, Agendar)
   lib/           nav.ts, data.ts, prices.ts, format.ts, types.ts, design-lab.ts
@@ -126,8 +128,9 @@ Alias `@/*` → `src/*` (definido en `tsconfig.json`).
 Se fueron las que no usaba nadie: `@google/genai`, `express`, `@types/express`,
 `dotenv`, `esbuild`, `tsx`, `autoprefixer`, `vite`, `@vitejs/plugin-react`.
 Volvieron `lucide-react` y `motion` porque los diseños nuevos sí las importan.
-Se eliminaron en la adopción `CurrencyProvider` (moneda única) y los
-componentes del exportador HTML (`TemplateViewer`, página `/descargar`).
+Se eliminaron en la adopción `CurrencyProvider` (moneda única), `TemplateViewer`
+junto a la página `/descargar`, y `DesignsDropdown` al quitar el enlace del
+header.
 
 ## Pendientes
 

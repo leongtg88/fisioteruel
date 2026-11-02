@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import DesignsDropdown from "@/components/DesignsDropdown";
 import { NAV_ITEMS, ROUTES, routeKeyFromPathname } from "@/lib/nav";
 
 export default function Header() {
@@ -77,13 +76,6 @@ export default function Header() {
                 </Link>
               );
             })}
-
-            {/* Candidatos de rediseño (Comparativa /disenos). A partir de lg:
-                por debajo de ese ancho no cabe todo el menú y ya se accede
-                desde el drawer. */}
-            <div className="hidden lg:block">
-              <DesignsDropdown variant="desktop" />
-            </div>
           </div>
 
           {/* Right action: CTA */}
@@ -156,8 +148,6 @@ export default function Header() {
                 </Link>
               );
             })}
-
-            <DesignsDropdown variant="drawer" />
           </div>
 
           {/* Drawer footer info */}
